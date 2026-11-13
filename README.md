@@ -7,6 +7,7 @@
 - [Linux·네트워크 기초 실습](docs/foundations.md): 1~4주차 실행 안내
 - [취약점별 실습 안내](docs/labs.md): 5~11주차 요청과 예상 결과
 - [최종 프로젝트·보고서 양식](docs/report-template.md): 12주차 제출물
+- [역엔지니어링 12주 커리큘럼](docs/reverse-engineering.md): C·메모리부터 ELF 분석, GDB·Ghidra, 파일 형식 복원과 패치까지
 
 ## 첫 학습: Bandit
 
