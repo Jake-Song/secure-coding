@@ -1,0 +1,10 @@
+{"time": 0, "source": "192.0.2.10", "destination": "198.51.100.10", "port": 443, "event": "allow"}
+{"time": 1, "source": "192.0.2.50", "destination": "198.51.100.10", "port": 22, "event": "deny"}
+{"time": 2, "source": "192.0.2.50", "destination": "198.51.100.10", "port": 23, "event": "deny"}
+{"time": 3, "source": "192.0.2.50", "destination": "198.51.100.10", "port": 445, "event": "deny"}
+{"time": 4, "source": "192.0.2.50", "destination": "198.51.100.10", "port": 3389, "event": "deny"}
+{"time": 5, "source": "192.0.2.60", "destination": "198.51.100.10", "port": 443, "event": "auth_failure"}
+{"time": 6, "source": "192.0.2.60", "destination": "198.51.100.10", "port": 443, "event": "auth_failure"}
+{"time": 7, "source": "192.0.2.60", "destination": "198.51.100.10", "port": 443, "event": "auth_failure"}
+{"time": 20, "source": "192.0.2.70", "destination": "198.51.100.10", "port": 22, "event": "deny"}
+{"time": 40, "source": "192.0.2.70", "destination": "198.51.100.10", "port": 23, "event": "deny"}

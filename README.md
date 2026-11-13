@@ -8,6 +8,8 @@
 - [취약점별 실습 안내](docs/labs.md): 5~11주차 요청과 예상 결과
 - [최종 프로젝트·보고서 양식](docs/report-template.md): 12주차 제출물
 - [역엔지니어링 12주 커리큘럼](docs/reverse-engineering.md): C·메모리부터 ELF 분석, GDB·Ghidra, 파일 형식 복원과 패치까지
+- [네트워크 보안 12주 커리큘럼](docs/network-security.md): TCP·DNS·TLS·메시지 인증·접근 정책·로그 탐지
+- [네트워크 보안 실습 코드와 실행 안내](docs/network-labs.md): 로컬 통신과 오프라인 모델로 구성한 여섯 실습
 
 ## 첫 학습: Bandit
 
@@ -77,6 +79,20 @@ python examples/tcp_server.py
 python examples/tcp_client.py '안녕하세요'
 ```
 
+## 네트워크 보안 실습
+
+저장소 루트에서 실행합니다. Python 표준 라이브러리를 사용하며 TLS 예제에는 설치된 OpenSSL CLI가 필요합니다. 웹 앱 실행이나 추가 Python 패키지 설치는 필요하지 않습니다.
+
+```bash
+python3 -m examples.network_security all
+```
+
+`framing`, `dns`, `pcap`, `tls`, `auth`, `policy`, `detection`을 개별 명령으로도 실행할 수 있습니다. 실제 TCP·UDP·TLS는 `127.0.0.1`의 임시 포트에서 통신합니다. PCAP과 로그는 합성 데이터이며 접근 정책은 오프라인 모델입니다. 상세한 예상 결과와 수정 과제는 [실습 안내](docs/network-labs.md)에 있습니다.
+
+```bash
+python3 -m unittest tests.test_network_protocols tests.test_network_auth tests.test_network_tls tests.test_network_policy -v
+```
+
 ## 테스트
 
 ```bash
@@ -85,7 +101,7 @@ python -m unittest discover -s tests -v
 
 테스트는 취약한 동작이 재현되는지, 방어 구현이 공격을 차단하는지, 정상 기능이 유지되는지를 함께 확인합니다. TCP 테스트는 실제 loopback 소켓을 사용합니다. 네트워크가 제한된 환경에서는 웹·경계 예제만 먼저 검사할 수 있습니다.
 
-작성 시 전체 29개 테스트가 통과했습니다. 실행 환경과 확인 범위는 [검증 기록](docs/validation.md)에 있습니다.
+네트워크 보안 실습 추가 후 전체 **65개 테스트**가 통과했습니다. 초기 웹·경계·TCP·HTTP 예제는 29개, 신규 네트워크 보안은 36개입니다. 실행 환경과 확인 범위는 [검증 기록](docs/validation.md)에 있습니다.
 
 ```bash
 python -m unittest tests.test_app tests.test_boundaries -v
@@ -115,6 +131,7 @@ examples/tcp_client.py        EOF까지 수신하는 클라이언트
 examples/http_demo.py         실제 HTTP 비교
 examples/csrf_server.py       다른 origin의 CSRF 폼
 examples/boundaries.py        명령어·파일·업로드·가상 SSRF
+examples/network_security/   TCP·DNS·PCAP·TLS·HMAC·정책·탐지 실습
 tests/                       공격 재현·방어·정상 동작 테스트
 docs/                        커리큘럼·실습·보고서
 ```
