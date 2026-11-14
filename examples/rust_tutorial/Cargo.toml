@@ -1,0 +1,38 @@
+[package]
+name = "rust-tutorial"
+version = "0.1.0"
+edition = "2021"
+publish = false
+autobins = false
+
+[[bin]]
+name = "hello"
+path = "01_hello.rs"
+
+[[bin]]
+name = "basics"
+path = "02_basics.rs"
+
+[[bin]]
+name = "ownership"
+path = "03_ownership.rs"
+
+[[bin]]
+name = "structs"
+path = "04_structs.rs"
+
+[[bin]]
+name = "collections"
+path = "05_collections.rs"
+
+[[bin]]
+name = "errors"
+path = "06_errors.rs"
+
+[[bin]]
+name = "input"
+path = "07_input.rs"
+
+[[bin]]
+name = "score_report"
+path = "08_score_report.rs"

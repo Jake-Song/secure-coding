@@ -7,6 +7,9 @@
 - [Linux·네트워크 기초 실습](docs/foundations.md): 1~4주차 실행 안내
 - [취약점별 실습 안내](docs/labs.md): 5~11주차 요청과 예상 결과
 - [최종 프로젝트·보고서 양식](docs/report-template.md): 12주차 제출물
+- [C 언어 입문 튜토리얼](docs/c-tutorial.md): 컴파일부터 배열·포인터·메모리·입력 검증·파일 저장까지, 실행 예제 8개
+- [C++ 입문 튜토리얼](docs/cpp-tutorial.md): 참조·문자열·vector·클래스·알고리즘·RAII·입력 검증, 실행 예제 8개
+- [Rust 입문 튜토리얼](docs/rust-tutorial.md): 소유권·빌림·구조체·enum·컬렉션·Result·파일 저장, 실행 예제 8개
 - [역엔지니어링 12주 커리큘럼](docs/reverse-engineering.md): C·메모리부터 ELF 분석, GDB·Ghidra, 파일 형식 복원과 패치까지
 - [네트워크 보안 12주 커리큘럼](docs/network-security.md): TCP·DNS·TLS·메시지 인증·접근 정책·로그 탐지
 - [네트워크 보안 실습 코드와 실행 안내](docs/network-labs.md): 로컬 통신과 오프라인 모델로 구성한 여섯 실습
@@ -131,6 +134,9 @@ examples/tcp_client.py        EOF까지 수신하는 클라이언트
 examples/http_demo.py         실제 HTTP 비교
 examples/csrf_server.py       다른 origin의 CSRF 폼
 examples/boundaries.py        명령어·파일·업로드·가상 SSRF
+examples/c_tutorial/          C 입문 예제 8개와 Makefile
+examples/cpp_tutorial/        C++17 입문 예제 8개와 Makefile
+examples/rust_tutorial/       Rust 입문 예제 8개와 Cargo 프로젝트
 examples/network_security/   TCP·DNS·PCAP·TLS·HMAC·정책·탐지 실습
 tests/                       공격 재현·방어·정상 동작 테스트
 docs/                        커리큘럼·실습·보고서

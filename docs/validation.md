@@ -1,5 +1,29 @@
 # 검증 기록
 
+## 2026-11-15 C++·Rust 입문 튜토리얼 추가
+
+Linux x86-64에서 C++ 예제 8개와 Rust 예제 8개를 빌드했습니다. C++ 컴파일러는 GCC 13.3.0, Rust 도구는 rustc·Cargo 1.91.1입니다. C++는 C++17, Rust는 2021 edition이며 외부 패키지를 추가하지 않았습니다.
+
+이 환경의 Rust 도구 디렉터리는 PATH에 포함되지 않아, 설치된 컴파일러 경로를 명시했습니다. 일반적인 PATH 설치 환경에서는 `RUSTC` 지정 없이 `cargo`·`rustc`를 사용할 수 있습니다.
+
+```bash
+make -C examples/cpp_tutorial
+RUSTC=/home/jake/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc \
+  /home/jake/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo \
+  build --offline --manifest-path examples/rust_tutorial/Cargo.toml
+RUSTC=/home/jake/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc \
+  python3 -m unittest tests.test_cpp_rust_tutorials -v
+```
+
+결과: **신규 테스트 20개 통과**, skip 없음. C++ 9개와 Rust 11개입니다. 테스트에서는 경고를 오류로 처리하여 다시 컴파일했습니다.
+
+- 두 언어의 고정 예제 출력, 숫자 0·100, 선행 0, 잘못된 형식·큰 정수·널 문자·비 ASCII 숫자 거부.
+- 한 줄 입력의 62·63바이트 경계, 줄바꿈 없는 짧은 숫자와 빈 EOF 구분.
+- 점수 1개·100개·101개, 오류 입력 후 파일 미생성, 기존 파일 보존, 없는 출력 디렉터리 처리.
+- Rust의 CRLF 입력, 이동한 값의 재사용과 충돌하는 빌림에 대한 컴파일 오류.
+
+문서의 로컬 링크와 코드 블록 구분도 검사했습니다. Windows·macOS 실행과 최종 확장 과제, C++ Sanitizer 실행은 이번 추가에서 검증하지 않았습니다. 기존 웹·네트워크 테스트 전체를 다시 실행한 결과는 아닙니다.
+
 ## 2026-11-14 네트워크 보안 실습 추가
 
 전체 검증 환경: Linux x86-64, Python 3.13.7, Python SSL의 OpenSSL 3.5.3, 인증서 생성 CLI의 OpenSSL 3.0.13, Flask 3.1.3, Werkzeug 3.1.9.
