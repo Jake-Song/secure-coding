@@ -63,6 +63,8 @@ gdb --version
 
 ## 1~4주차 기반 만들기
 
+실행 가능한 예제와 단계별 설명은 [1~4주차 학습자료](reverse-engineering-labs.md)에 있습니다. [1주차 C와 빌드](reverse-engineering/week-01.md), [2주차 메모리](reverse-engineering/week-02.md), [3주차 명령어](reverse-engineering/week-03.md), [4주차 호출과 ELF](reverse-engineering/week-04.md) 순서로 진행합니다.
+
 ### 1주차 C와 컴파일
 
 아래의 [첫 실습](#첫-실습)을 실행한 뒤 `if`, `for`, `switch`, 함수 호출이 각각 들어간 짧은 프로그램을 만듭니다. `gcc -E`로 전처리 결과, `gcc -S`로 어셈블리, `gcc -c`로 오브젝트를 만듭니다.

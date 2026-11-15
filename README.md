@@ -11,6 +11,7 @@
 - [C++ 입문 튜토리얼](docs/cpp-tutorial.md): 참조·문자열·vector·클래스·알고리즘·RAII·입력 검증, 실행 예제 8개
 - [Rust 입문 튜토리얼](docs/rust-tutorial.md): 소유권·빌림·구조체·enum·컬렉션·Result·파일 저장, 실행 예제 8개
 - [역엔지니어링 12주 커리큘럼](docs/reverse-engineering.md): C·메모리부터 ELF 분석, GDB·Ghidra, 파일 형식 복원과 패치까지
+- [역엔지니어링 1~4주차 학습자료](docs/reverse-engineering-labs.md): 주차별 개념·실행 예제·GDB 관찰·수정 과제·제출물
 - [네트워크 보안 12주 커리큘럼](docs/network-security.md): TCP·DNS·TLS·메시지 인증·접근 정책·로그 탐지
 - [네트워크 보안 실습 코드와 실행 안내](docs/network-labs.md): 로컬 통신과 오프라인 모델로 구성한 여섯 실습
 
@@ -137,6 +138,7 @@ examples/boundaries.py        명령어·파일·업로드·가상 SSRF
 examples/c_tutorial/          C 입문 예제 8개와 Makefile
 examples/cpp_tutorial/        C++17 입문 예제 8개와 Makefile
 examples/rust_tutorial/       Rust 입문 예제 8개와 Cargo 프로젝트
+examples/reverse_engineering/ 역엔지니어링 1~4주차 C·어셈블리 예제와 Makefile
 examples/network_security/   TCP·DNS·PCAP·TLS·HMAC·정책·탐지 실습
 tests/                       공격 재현·방어·정상 동작 테스트
 docs/                        커리큘럼·실습·보고서

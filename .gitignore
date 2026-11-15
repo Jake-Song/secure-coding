@@ -9,3 +9,4 @@ notes/private/
 examples/c_tutorial/build/
 examples/cpp_tutorial/build/
 examples/rust_tutorial/target/
+examples/reverse_engineering/build/
