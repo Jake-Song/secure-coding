@@ -1,8 +1,53 @@
 # 1주차: C와 빌드 흐름
 
-[학습자료 안내](../reverse-engineering-labs.md) · [다음: 2주차](week-02.md)
+[12주 커리큘럼](../reverse-engineering.md) · [다음: 2주차](week-02.md)
 
 이번 주 목표는 C의 입력·출력·분기·배열·함수를 읽고, **소스·어셈블리·오브젝트·실행 파일의 차이**를 설명하는 것입니다. 소스는 [01_build.c](../../examples/reverse_engineering/01_build.c)입니다.
+
+## 0. 과정 시작 전 준비
+
+1~8주차 자료의 명령은 별도 표시가 없으면 **저장소 루트**에서 실행합니다. 기준 환경은 x86-64 Linux 또는 WSL2입니다. ARM 머신은 x86-64 Linux 가상 머신을 사용합니다.
+
+```bash
+uname -m
+gcc --version
+gdb --version
+readelf --version
+python3 --version
+make -C examples/reverse_engineering
+python3 -m unittest tests.test_reverse_engineering -v
+```
+
+`uname -m`은 `x86_64`여야 합니다. 도구가 없으면 Ubuntu/Debian 실습 머신에서 `sudo apt install build-essential binutils file gdb python3`로 설치합니다. Ghidra는 5주차 전에 [공식 설치 안내](https://github.com/NationalSecurityAgency/ghidra#install)대로 준비합니다.
+
+빌드 결과는 `examples/reverse_engineering/build/`에 생깁니다. 기본 옵션 `-O0 -g -fno-omit-frame-pointer -fPIE -pie`는 최적화를 줄이고 디버그 정보를 남기면서 PIE 주소 변화를 관찰하기 위한 설정입니다. 4주차에는 non-PIE 비교본, 5·7주차에는 심볼을 지운 `_stripped` 사본을 함께 만듭니다. 자동 테스트는 빌드·동작·ELF 속성만 확인하며, GDB·Ghidra 관찰은 각 주차 절차로 직접 수행합니다.
+
+매주 같은 양식으로 보고서를 남깁니다. 개인 기록은 Git에서 제외된 `notes/private/`에 둘 수 있습니다.
+
+```text
+주차 / 날짜:
+환경: OS, uname -m, GCC·Binutils·GDB(·Ghidra) 버전
+대상: 소스 경로, 빌드 명령, 실행 파일 SHA-256 (sha256sum 결과)
+분석 질문 / 실행 전 예측:
+재현 절차: 터미널 명령과 GDB 명령을 구분
+관찰: 입력, 출력, 종료 코드, 주소, 바이트, 레지스터
+해석: 관찰이 가설을 지지하거나 반박한 이유
+미확인: 아직 확인하지 못한 조건과 다음 확인 방법
+수정 과제: 변경 내용과 정상·오류·경계 입력 결과
+```
+
+막혔을 때 먼저 확인할 것:
+
+| 증상 | 확인과 해결 |
+|---|---|
+| `Exec format error` | `uname -m`과 `file 실행파일`을 비교하고 x86-64 Linux에서 재빌드 |
+| `No debugging symbols found` | 제공 Makefile로 다시 빌드하고 `build/`의 디버그 실행 파일(이름에 `_stripped`가 없는 것) 열기 |
+| GDB에서 지역 변수·인자가 이상함 | 함수 첫 명령인지, 초기화가 끝난 줄인지 확인. `bt`, `frame`, `info locals` 사용 |
+| `ptrace: Operation not permitted` | 컨테이너·샌드박스의 디버깅 제한. ptrace가 허용된 개인 실습 VM에서 진행 |
+| 주소가 문서와 다름 | 정상입니다. 자신의 `disassemble`, `print/x &변수`, `info proc mappings` 결과로 기록 |
+| 소스를 바꿨는데 결과가 같음 | `make -C examples/reverse_engineering` 후 실행 파일 경로와 수정 시간 확인 |
+
+GDB에 입력할 명령은 `gdb` 코드 블록으로 표시합니다. `$rax` 같은 표기는 GDB 안에서 해석되므로 셸에 붙여 넣지 않습니다.
 
 ## 1. 학습 순서와 시간
 

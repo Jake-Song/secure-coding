@@ -63,7 +63,7 @@ gdb --version
 
 ## 1~4주차 기반 만들기
 
-실행 가능한 예제와 단계별 설명은 [1~4주차 학습자료](reverse-engineering-labs.md)에 있습니다. [1주차 C와 빌드](reverse-engineering/week-01.md), [2주차 메모리](reverse-engineering/week-02.md), [3주차 명령어](reverse-engineering/week-03.md), [4주차 호출과 ELF](reverse-engineering/week-04.md) 순서로 진행합니다.
+실행 가능한 예제와 단계별 설명은 주차별 학습자료에 있습니다. 예제는 저장소 루트에서 `make -C examples/reverse_engineering`으로 빌드하고 `python3 -m unittest tests.test_reverse_engineering -v`로 확인합니다. [1주차 C와 빌드](reverse-engineering/week-01.md), [2주차 메모리](reverse-engineering/week-02.md), [3주차 명령어](reverse-engineering/week-03.md), [4주차 호출과 ELF](reverse-engineering/week-04.md) 순서로 진행합니다.
 
 ### 1주차 C와 컴파일
 
@@ -101,6 +101,8 @@ Linux의 System V AMD64 ABI를 기준으로 단순한 정수·포인터 인자�
 완료 기준: ELF 진입점과 C의 `main`을 구분하고, PIE·ASLR 때문에 정적 주소와 실행 중 주소가 달라질 수 있음을 설명합니다.
 
 ## 5~8주차 분석과 재구현
+
+실행 가능한 예제와 단계별 설명은 [5주차 Ghidra](reverse-engineering/week-05.md), [6주차 GDB](reverse-engineering/week-06.md), [7주차 입력 검증](reverse-engineering/week-07.md), [8주차 재구현](reverse-engineering/week-08.md)에 있습니다. 학습자료는 아래 요약의 첫 실습 바이너리 대신 구조체 테이블(`05_lookup`)·다단계 검사(`07_validate`)·바이트 변환(`08_transform`) 전용 예제와 strip 사본을 사용하며, 소스는 분석을 마친 뒤 대조 단계에서만 엽니다.
 
 ### 5주차 Ghidra
 
@@ -266,6 +268,6 @@ quit
 
 ## 제공 범위와 확인 상태
 
-이 문서는 학습 계획, 주별 과제, 첫 C 예제와 실행 절차를 제공합니다. 7~12주차 과제용 바이너리·입력 생성기·채점 환경은 동봉하지 않았습니다. 주별 조건에 맞춰 직접 만들거나 연결된 교육 과제를 선택합니다.
+이 문서는 학습 계획, 주별 과제, 첫 C 예제와 실행 절차를 제공합니다. 1~8주차의 주차별 학습자료·예제 소스·Makefile·자동 테스트와 8주차 재구현 비교 도구 `examples/reverse_engineering/compare_transform.py`를 함께 제공합니다. 9~12주차 과제용 바이너리·입력 생성기·채점 환경은 동봉하지 않았습니다. 주별 조건에 맞춰 직접 만들거나 연결된 교육 과제를 선택합니다.
 
 2026-11-14, Linux x86-64에서 첫 C 예제의 네 빌드, 출력·종료 코드, ELF 정보, 문자열, 디스어셈블 결과를 확인했습니다. GDB·Ghidra 조작은 이 환경에서 실행 확인하지 않았습니다.

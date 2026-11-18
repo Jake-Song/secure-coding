@@ -1,6 +1,6 @@
 # 2주차: 포인터와 프로세스 메모리
 
-[이전: 1주차](week-01.md) · [학습자료 안내](../reverse-engineering-labs.md) · [다음: 3주차](week-03.md)
+[이전: 1주차](week-01.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 3주차](week-03.md)
 
 이번 주 목표는 **값·주소·그 주소의 바이트·객체 수명**을 따로 설명하는 것입니다. [02_memory.c](../../examples/reverse_engineering/02_memory.c)를 읽고 GDB로 관찰합니다. 분석을 위해 배열 경계를 넘거나 해제된 공간을 읽을 필요는 없습니다.
 
@@ -138,6 +138,8 @@ print &record->tag
 print &record->count
 print &record->flags
 ```
+
+`print &record->tag`는 `0x... "R"`처럼 주소 뒤에 문자열을 덧붙여 보여 줍니다. 자료형이 `char *`이면 GDB가 그 주소부터 NUL까지를 문자열로 읽어 표시하기 때문입니다. `tag`는 문자 하나일 뿐 문자열이 아니며, 뒤따르는 바이트는 패딩이나 다른 필드입니다. 주소만 보려면 `print (void *)&record->tag`를 사용합니다.
 
 기준 환경의 배치는 다음과 같습니다. `offsetof`의 출력과 대조합니다.
 

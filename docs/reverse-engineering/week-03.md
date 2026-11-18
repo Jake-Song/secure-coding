@@ -1,6 +1,6 @@
 # 3주차: x86-64 명령어와 제어 흐름
 
-[이전: 2주차](week-02.md) · [학습자료 안내](../reverse-engineering-labs.md) · [다음: 4주차](week-04.md)
+[이전: 2주차](week-02.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 4주차](week-04.md)
 
 이번 주 목표는 **명령이 바꾸는 값과 분기가 선택하는 다음 위치**를 추적하는 것입니다. [03_flow.c](../../examples/reverse_engineering/03_flow.c)와 [registers.S](../../examples/reverse_engineering/registers.S)를 사용합니다. x86-64의 Intel 문법만 다룹니다.
 
@@ -145,9 +145,18 @@ display/i $pc
 info registers eax edi eflags
 ```
 
-`stepi`로 `cmp` 직전까지 간 뒤 피연산자 값을 기록합니다. `cmp` 실행 직후의 `info registers eflags`, 다음 분기 실행 직후의 `$pc`를 기록합니다. 디스어셈블에 나온 자기 주소를 사용합니다. 새 GDB 세션에서는 중단점을 `choose_unsigned`에 두고 `run`하여 unsigned 경로도 비교합니다. 두 호출의 순서는 `printf` 인자 평가 순서에 따라 달라질 수 있으므로 각각 새 실행에서 관찰합니다.
+`display/i $pc`가 보여 주는 다음 명령을 먼저 확인합니다. 기준 빌드(GCC 13.3, `-O0`)에서는 이름 중단점이 프롤로그 뒤에 잡혀 **이미 `cmp` 명령 위에** 멈춥니다. 다른 명령이면 `stepi`로 `cmp` 직전까지 갑니다. 이 시점의 `eflags`는 이전 명령들이 남긴 값이므로 비교 결과로 기록하지 않습니다. 피연산자 값을 기록한 뒤 `stepi` 한 번으로 `cmp`만 실행하고 `info registers eflags`, 다시 `stepi`로 분기를 실행한 직후의 `$pc`를 기록합니다. 디스어셈블에 나온 자기 주소를 사용합니다. 새 GDB 세션에서는 중단점을 `choose_unsigned`에 두고 `run`하여 unsigned 경로도 비교합니다. 두 호출의 순서는 `printf` 인자 평가 순서에 따라 달라질 수 있으므로 각각 새 실행에서 관찰합니다.
 
 관찰표의 열은 `함수 / 명령 주소 / 명령 / 피연산자 값 / ZF·SF·CF·OF / 다음 PC / 선택한 반환값`으로 만듭니다. 최종 반환값은 각각 1과 0이어야 합니다.
+
+기준 빌드에서 관찰한 예입니다. 두 함수 모두 `value < 10`을 `cmp DWORD PTR [rbp-0x4],0x9`와 **반대 조건의 분기**로 표현했습니다.
+
+| 함수 | 비교 | `cmp` 직후 `eflags` | 분기 | 분기 조건 | 결과 |
+|---|---|---|---|---|---|
+| `choose_signed(-1)` | `0xffffffff - 9` | `0x286` (SF=1, ZF=0, CF=0, OF=0) | `jg` | ZF=0이고 SF=OF → 거짓, 이동 안 함 | `mov eax,0x1` → 1 |
+| `choose_unsigned(UINT_MAX)` | `0xffffffff - 9` | `0x286` (SF=1, ZF=0, CF=0, OF=0) | `ja` | CF=0이고 ZF=0 → 참, 이동 | `mov eax,0x0` → 0 |
+
+**같은 비트 패턴, 같은 플래그**인데 결과가 다릅니다. signedness는 `cmp`가 아니라 **뒤따르는 분기 명령**이 정합니다. `0x286`의 비트는 PF(2)·SF(7)·IF(9)이며, GDB는 `[ PF SF IF ]`처럼 켜진 플래그 이름을 함께 보여 줍니다.
 
 ## 6. 실습 D: 루프에서 제어 흐름 복원하기
 

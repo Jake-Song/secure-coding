@@ -1,0 +1,227 @@
+# 6주차: GDB 동적 분석
+
+[이전: 5주차](week-05.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 7주차](week-07.md)
+
+이번 주 목표는 **5주차의 정적 분석 가설을 실행 관찰로 검증**하는 것입니다. 같은 대상 `05_lookup`과 `05_lookup_stripped`를 사용합니다. 두 입력의 실행 경로를 명령 단위로 비교하고, 기록을 다른 사람이 다시 실행할 수 있는 GDB 스크립트로 남깁니다.
+
+## 1. 학습 순서와 시간
+
+| 단계 | 시간 | 결과 |
+|---|---|---|
+| GDB 명령 정리 | 1시간 | 중단·진행·관찰 명령의 차이 설명 |
+| 가설 H1·H2 검증 | 2시간 | 반환값·필드·분기 경로 기록 |
+| 가설 H3 검증 | 1시간 | 워치포인트로 전역 값 변화 관찰 |
+| strip 파일 디버깅 | 1.5시간 | 로드 베이스 + 정적 주소로 중단점 설정 |
+| 스크립트·보고서 | 1.5시간 | 재현 가능한 `.gdb` 파일과 경로 비교표 |
+
+## 2. 먼저 읽을 개념: 중단·진행·관찰
+
+| 분류 | 명령 | 의미 |
+|---|---|---|
+| 시작 | `run ARGS`, `start`, `starti` | 처음부터 실행 / `main` 첫 줄에서 정지 / 첫 명령(동적 로더)에서 정지 |
+| 중단점 | `break 함수`, `break *주소`, `tbreak`, `break ... if 조건` | 소스 위치·정확한 명령 주소·한 번만·조건부 |
+| 워치포인트 | `watch 식`, `rwatch`, `awatch` | 값이 바뀔 때 / 읽힐 때 / 둘 다 정지 |
+| 진행 | `continue`, `stepi`, `nexti`, `finish`, `until`, `advance 위치` | 다음 정지까지 / 한 명령(호출 안으로) / 한 명령(호출 넘김) / 현재 함수 복귀까지 |
+| 관찰 | `info registers`, `print`, `x/FMT 주소`, `display`, `bt`, `info frame` | 레지스터·식·메모리·매 정지 표시·호출 스택·프레임 |
+| 관리 | `info breakpoints`, `delete`, `disable` | 중단점 목록과 정리 |
+
+`x`의 형식은 `x/개수 형식 크기`입니다. 예: `x/4wx $rdi`는 `rdi` 주소부터 4바이트(w) 값 4개를 16진수로, `x/s 주소`는 NUL로 끝나는 문자열, `x/6i $pc`는 다음 명령 6개입니다. 자세한 형식은 [GDB 메모리 검사 설명](https://sourceware.org/gdb/current/onlinedocs/gdb.html/Memory.html)을 참고합니다.
+
+`stepi`와 `nexti`는 `call`에서만 차이가 납니다. `stepi`는 호출된 함수의 첫 명령으로 들어가고, `nexti`는 호출이 끝난 다음 명령에서 멈춥니다. `finish`는 현재 함수가 반환할 때까지 실행한 뒤 반환값을 `Value returned is ...`로 보여 줍니다.
+
+### ASLR과 GDB
+
+GDB는 기본적으로 ASLR을 끄고 실행합니다. 그러면 PIE도 매번 `0x555555554000` 근처에 놓여, 주소를 외워도 되는 것처럼 보입니다. 4주차와 같이 이번 과정에서는 `set disable-randomization off`로 실제 환경에 가깝게 두고, **주소는 매 실행 계산**합니다.
+
+## 3. 실습 A: 반환값으로 H1 검증
+
+```bash
+make -C examples/reverse_engineering
+cd examples/reverse_engineering/build
+gdb -q --args ./05_lookup nobody
+```
+
+```gdb
+set pagination off
+set disassembly-flavor intel
+set disable-randomization off
+break find_account
+run
+bt
+finish
+print/x $rax
+x/3i $pc
+```
+
+`finish`가 끝나면 `main` 안의 `call` 다음 명령에 있습니다. `x/3i $pc`로 그 다음이 반환값을 저장하고 0과 비교하는 명령인지 확인합니다. `nobody`의 `rax`는 0이어야 합니다(H1).
+
+같은 절차를 `analyst`로 반복합니다. 이번에는 반환값이 테이블 안의 주소입니다.
+
+```gdb
+run analyst
+finish
+print/x $rax
+print/x $rax - (unsigned long)&accounts
+x/s *(char **)$rax
+x/2wu $rax + 8
+print *(const struct account *)$rax
+```
+
+`$rax - &accounts`는 16이어야 합니다. 즉 1번 원소입니다. `x/s *(char **)$rax`는 원소 `+0`의 포인터가 가리키는 문자열 `analyst`, `x/2wu $rax+8`은 level 3·flags 1입니다. 마지막 `print`는 디버그 정보가 있는 빌드에서만 가능합니다. 앞의 세 명령은 자료형 정보 없이 5주차에서 추론한 오프셋만으로 같은 사실을 보여 줍니다.
+
+`run`을 다시 입력하면 GDB가 프로그램을 처음부터 다시 시작할지 묻습니다. 새 실행에서는 주소가 바뀔 수 있으므로 앞 실행의 주소를 재사용하지 않습니다.
+
+## 4. 실습 B: 두 입력의 경로 비교로 H2 검증
+
+`is_allowed`의 첫 명령에서 멈춥니다. 4주차에서 확인했듯이 첫 명령에서는 첫 두 인자가 `rdi`, `esi`에 있습니다.
+
+```gdb
+delete
+break *is_allowed
+run guest
+info registers rdi rsi
+x/4wx $rdi
+disassemble
+```
+
+첫 명령에서 GDB가 `is_allowed (account=0x0, required=0)`처럼 엉뚱한 인자 값을 보여 줄 수 있습니다. 디버그 정보는 인자를 프롤로그 뒤 `[rbp-...]`에서 찾는데, 첫 명령에서는 아직 그 위치에 저장하지 않았기 때문입니다. 이번 주에는 **레지스터 값을 기준**으로 기록합니다.
+
+`disassemble`에서 `and eax,0x1` 다음 분기와 `cmp`·`setae` 위치를 확인한 뒤 `stepi`로 한 명령씩 진행합니다.
+
+```gdb
+display/i $pc
+stepi
+stepi
+```
+
+`and` 직후의 `eax`, 분기 직후의 `$pc`, `cmp` 직후의 `eflags`, `setae` 직후의 `al`을 기록합니다. 마지막으로 `finish`로 반환값을 확인합니다. 새 실행에서 `analyst`, `retired`를 반복합니다.
+
+경로 비교표를 완성합니다. `분기 결과`에는 실제로 이동한 다음 PC를 적습니다.
+
+| 입력 | `rdi`가 가리키는 원소 | level / flags | `flags & 1` 이후 분기 | `cmp` 직후 CF | 반환값 | 출력 |
+|---|---|---|---|---|---|---|
+| `analyst` | 1번 | 3 / 1 | 계속 진행 | 0 | 1 | `accepted level=3` |
+| `guest` | 0번 | 1 / 1 | 계속 진행 | 1 | 0 | `access denied` |
+| `retired` | 2번 | 5 / 0 | 조기 반환 | 실행 안 됨 | 0 | `access denied` |
+
+`guest`와 `retired`는 출력이 같지만 **거부되는 명령 위치가 다릅니다**. 이것이 H2의 근거입니다. 출력만 비교하면 이 차이를 알 수 없습니다.
+
+`setae`가 unsigned 조건이라는 5주차 해석도 여기서 확인합니다. level 1과 required 3을 비교하면 unsigned 빌림이 생겨 CF=1, `setae`는 0을 만듭니다.
+
+## 5. 실습 C: 워치포인트로 H3 검증
+
+정적 분석에서 `find_account`가 루프마다 전역 값 하나를 1씩 증가시킨다고 추론했습니다. 이 값이 바뀔 때마다 멈추게 합니다.
+
+```gdb
+delete
+start root
+watch lookup_count
+commands
+  silent
+  printf "lookup_count=%u\n", lookup_count
+  bt 1
+  continue
+end
+continue
+```
+
+`start`는 `main`의 첫 줄에서 멈춥니다. 전역 변수의 주소는 프로그램이 로드된 뒤에 확정되므로 워치포인트는 그 다음에 설정합니다. `commands` 블록은 해당 정지에서 실행할 명령입니다.
+
+| 입력 | 관찰한 변화 | 결론 |
+|---|---|---|
+| `guest` | 1 | 첫 원소에서 일치 |
+| `root` | 1, 2, 3, 4 | 마지막 원소까지 비교 |
+| `nobody` | 1, 2, 3, 4 | 끝까지 비교 후 NULL |
+
+GDB는 가능하면 CPU의 하드웨어 워치포인트를 사용합니다. `Hardware watchpoint 2: lookup_count`처럼 표시됩니다. 소프트웨어 워치포인트는 매 명령을 확인하므로 매우 느릴 수 있습니다. `rwatch lookup_count`로 바꿔 **읽기**도 관찰해 보고, 증가 연산이 읽기와 쓰기를 모두 한다는 점을 기록합니다.
+
+## 6. 실습 D: 심볼 없는 파일에서 중단점 설정
+
+strip된 파일에는 `find_account`라는 이름이 없으므로 `break find_account`가 실패합니다. 대신 **정적 주소 + 실행 시 로드 베이스**로 중단합니다.
+
+먼저 셸에서 정적 주소를 찾습니다. `main`에서 첫 사용자 함수 호출 다음 명령, 즉 반환값을 저장하는 명령의 주소를 고릅니다.
+
+```bash
+objdump -d -M intel 05_lookup_stripped | grep -n -A1 -E 'call +[0-9a-f]+ <' | less
+```
+
+기준 빌드에서는 `12b1: call 11a9` 다음 `12b6: mov QWORD PTR [rbp-0x8],rax`였습니다. 자신의 값을 사용합니다. 이제 GDB에서 로드 베이스를 확인합니다.
+
+```bash
+gdb -q --args ./05_lookup_stripped analyst
+```
+
+```gdb
+set pagination off
+set disassembly-flavor intel
+set disable-randomization off
+starti
+info proc mappings
+```
+
+`starti`는 프로그램의 첫 명령, 보통 동적 로더 안에서 멈춥니다. 이때 실행 파일은 이미 매핑돼 있습니다. `05_lookup_stripped` 행 중 **Offset이 `0x0`인 첫 행의 Start Addr**가 로드 베이스입니다. 그 값을 직접 입력합니다.
+
+```gdb
+set $base = 0x이곳에_자신의_Start_Addr
+break *($base + 0x12b6)
+continue
+x/i $pc
+print/x $rax
+x/s *(char **)$rax
+x/2wu $rax + 8
+continue
+```
+
+디버그 빌드와 같은 값(`analyst`, 3, 1)이 보이면, 5주차의 주소 변환식이 실행 중에도 맞다는 증거입니다. `nobody`로 반복하면 `rax=0`이고, 이어지는 `x/s *(char **)$rax`는 `Cannot access memory at address 0x0` 오류를 냅니다. NULL을 역참조하려 했기 때문이며, H1과 일치하는 관찰입니다.
+
+주 실행 파일의 로드 베이스는 페이지 단위로 정렬돼 하위 12비트가 0입니다. 두 번 새로 실행해 `$base`가 바뀌는지 확인합니다.
+
+## 7. 실습 E: 재현 가능한 스크립트
+
+대화형으로 확인한 절차를 파일로 만들면 보고서를 읽는 사람이 같은 관찰을 재현할 수 있습니다. 개인 기록은 Git에서 제외된 `notes/private/`에 둡니다.
+
+```bash
+mkdir -p notes/private
+cat > notes/private/week06-h2.gdb <<'EOF'
+set pagination off
+set disassembly-flavor intel
+set disable-randomization off
+break *is_allowed
+run
+info registers rdi rsi
+x/4wx $rdi
+finish
+continue
+EOF
+for name in analyst guest retired; do
+  echo "== $name"
+  gdb -q -batch -x notes/private/week06-h2.gdb \
+    --args examples/reverse_engineering/build/05_lookup "$name"
+done
+```
+
+`-batch`는 스크립트를 실행한 뒤 GDB를 종료하고, `--args` 뒤의 인자는 대상 프로그램에 전달됩니다. 출력에서 `Value returned is $N = 1/0`과 프로그램 출력이 위 경로 비교표와 맞는지 확인합니다. 스크립트가 중간에 오류를 내면 그 뒤 명령은 실행되지 않으므로, NULL을 역참조하는 명령은 성공 경로 스크립트에만 넣습니다.
+
+`ptrace: Operation not permitted`가 나오면 컨테이너·샌드박스가 디버깅을 막은 것입니다. ptrace가 허용된 개인 실습 VM에서 진행합니다.
+
+## 8. 수정 과제와 제출물
+
+1. `find_account` 안의 `call` 명령(`strcmp` 호출) 주소에 중단점을 두고, 멈출 때마다 `x/s $rdi`, `x/s $rsi`를 출력한 뒤 `continue`하는 `commands`를 작성합니다. `root` 입력에서 비교된 이름 4개를 순서대로 기록합니다.
+2. strip 파일에서 `is_allowed`의 첫 명령 주소를 찾아 `$base`로 중단하고 실습 B의 경로 비교표를 다시 채웁니다.
+3. 5주차 수정 과제 1(`auditor` 추가)을 빌드했다면 `nobody`의 워치포인트 변화 횟수를 예측하고 확인합니다.
+
+제출물:
+
+- 가설 H1~H3 각각의 검증 결과: 명령, 관찰값, 지지/반박 판단
+- 세 입력의 경로 비교표(분기 직후 PC 포함)
+- strip 파일의 로드 베이스 계산 기록(두 번의 실행)
+- 다른 사람이 실행할 수 있는 `.gdb` 스크립트 1개 이상
+
+자가 점검:
+
+- 함수 첫 명령에서 GDB가 보여 주는 인자 값과 레지스터 값이 다른 이유를 설명할 수 있는가?
+- `stepi`, `nexti`, `finish` 중 무엇을 썼는지 기록에 남겼는가?
+- 출력이 같은 두 입력의 경로가 다를 수 있음을 실제 PC로 보였는가?
+- 다른 실행의 주소를 복사하지 않고 매번 로드 베이스부터 계산했는가?
+
+**완료 기준:** 정적 분석 가설 3개가 각각 어떤 관찰로 지지되거나 반박됐는지 주소와 값으로 보여 주면 통과입니다. 명령별 동작은 [GDB 공식 설명서](https://sourceware.org/gdb/current/onlinedocs/gdb.html/)를 참고합니다.
