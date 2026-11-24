@@ -99,26 +99,37 @@ quit
 
 ## 4. 실습 B: ELF를 네 관점으로 읽기
 
-`file`로 실행 파일의 형식을 확인합니다. 이어서 `readelf`로 파일 자체의 정보, 파일 안의 섹션, 메모리에 올릴 세그먼트, 함수와 변수의 심볼을 차례로 살펴봅니다.
+`file`로 실행 파일의 형식을 확인합니다. `readelf`는 ELF 파일에 기록된 정보를 보여 줍니다. 옵션으로 ELF 헤더, 섹션, 세그먼트, 심볼 중 보고 싶은 정보를 고릅니다. 저장소 루트에서 실행합니다.
 
 ```bash
-file examples/reverse_engineering/build/04_elf
-readelf -hW examples/reverse_engineering/build/04_elf
-readelf -SW examples/reverse_engineering/build/04_elf
-readelf -lW examples/reverse_engineering/build/04_elf
-readelf -sW examples/reverse_engineering/build/04_elf
+elf=examples/reverse_engineering/build/04_elf
+file "$elf"
+readelf -hW "$elf"
 ```
 
-| 명령 | 질문 | 기록할 항목 |
+| 옵션 | 무엇을 보여 주는가 | `04_elf`에서 확인할 항목 |
 |---|---|---|
-| `-h` | 어떤 파일인가? 어디서 시작하는가? | ELF64, little-endian, x86-64, 타입, Entry point |
-| `-S` | 코드·데이터·메타데이터는 어떻게 나뉘는가? | 섹션 이름, Type, Address, Offset, Size, Flags |
-| `-l` | 로더가 무엇을 메모리에 배치하는가? | `LOAD`의 Offset, VirtAddr, FileSiz, MemSiz, Flags |
-| `-s` | 어떤 이름이 어떤 위치·크기를 뜻하는가? | `main`, `sum_seven`, `message`, `initialized`, `zeroed`의 Value·Size·Ndx |
+| `-h` (`--file-header`) | ELF 헤더. 파일의 형식과 진입점을 보여 줍니다. | ELF64, little-endian, x86-64, 타입 `DYN`, `Entry point` `0x1060` |
+| `-S` (`--section-headers`) | 섹션 표. 코드와 데이터가 어떻게 나뉘는지 보여 줍니다. | 이름, `Type`, `Address`, `Off`(파일 오프셋), `Size`, `Flg`. 이 빌드에서 `.rodata`는 `[18]`번입니다. |
+| `-l` (`--program-headers`) | 세그먼트 표. 로더가 파일의 어느 범위를 메모리에 어떻게 배치하는지 보여 줍니다. | `LOAD`의 `Offset`, `VirtAddr`, `FileSiz`, `MemSiz`, `Flg` |
+| `-s` (`--syms`) | 심볼 표. 함수나 변수의 이름, 값, 크기, 소속 섹션을 보여 줍니다. | `main`, `sum_seven`, `message`, `initialized`, `zeroed`의 `Value`, `Size`, `Ndx`. 이 빌드에서 `message`는 주소 `0x2008`, 크기 8바이트, 섹션 번호 `18`입니다. |
+| `-x 섹션` (`--hex-dump=섹션`) | 지정한 섹션의 바이트를 16진수로 보여 줍니다. | `-x .rodata`로 `elf-lab`과 문자열 끝의 `00`을 확인합니다. |
+| `-W` (`--wide`) | 긴 출력 행을 한 줄에 표시합니다. | `-lW`는 `-l -W`와 같으므로 `LOAD` 하나의 열을 한 줄에서 읽을 수 있습니다. |
 
-`-W`를 함께 붙이면 긴 출력 줄을 넓게 표시해 표를 읽기 편합니다. [GNU readelf 공식 문서](https://sourceware.org/binutils/docs/binutils/readelf.html)
+옵션은 대소문자를 구분합니다. **대문자 `-S`는 섹션**, **소문자 `-s`는 심볼**입니다. `-l`은 소문자 L이고, 도움말은 `-H` 또는 `--help`로 엽니다. [GNU readelf 공식 문서](https://sourceware.org/binutils/docs/binutils/readelf.html)
 
-섹션은 함수 기계어, 문자열, 변수의 초기값처럼 쓰임새가 비슷한 내용을 모아 둔 단위입니다. `readelf -sW`에서 심볼의 `Ndx`를 찾고, `readelf -SW`에서 같은 번호의 섹션을 찾으면 함수나 변수가 어느 섹션에 속하는지 확인할 수 있습니다.
+같은 셸에서 `message`를 따라가 봅니다. 출력 숫자가 다르면 자기 빌드에서 읽은 값을 사용합니다.
+
+```bash
+readelf -sW "$elf" | awk '$NF == "message"'  # 심볼의 주소와 Ndx 확인
+readelf -SW "$elf"                          # Ndx와 같은 번호의 섹션 확인
+readelf -lW "$elf"                          # 심볼 주소가 들어 있는 LOAD 확인
+readelf -x .rodata "$elf"                   # .rodata의 실제 바이트 확인
+```
+
+`-sW`에서 `message`의 `Ndx`가 `18`이면 `-SW`의 `[18]`번 `.rodata`와 연결합니다. `-lW`에서는 주소 `0x2008`을 포함하는 `LOAD`를 찾습니다. 범위를 계산하는 방법은 실습 D에서 다룹니다. `-x .rodata`에서 `0x2000` 행의 앞 8바이트를 지난 위치에 `65 6c 66 2d 6c 61 62 00`이 보입니다. 이 위치가 `0x2008`이고, 바이트를 문자로 읽으면 `elf-lab`과 문자열 끝을 뜻하는 `00`입니다.
+
+섹션은 함수 기계어, 문자열, 변수의 초기값처럼 쓰임새가 비슷한 내용을 모아 둔 단위입니다.
 
 | 섹션 | 예제 대상 | 파일의 내용 | 실행 시 의미 |
 |---|---|---|---|
