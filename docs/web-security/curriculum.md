@@ -19,7 +19,7 @@
 
 ## 공통 준비
 
-명령은 Ubuntu·WSL의 저장소 루트에서 실행합니다. 1주차에는 Python 환경 없이 시작할 수 있습니다. `.venv`에 의존성을 설치한 적이 있다면 바로 `source .venv/bin/activate`부터 시작하세요. 터미널을 새로 열면 활성화 명령도 다시 실행합니다.
+명령은 Linux·macOS 또는 WSL의 저장소 루트에서 실행합니다. 1주차는 Python 환경 없이 시작할 수 있으며, 웹 실습에는 Python 3.10 이상이 필요합니다. `.venv`에 의존성을 설치한 적이 있다면 바로 `source .venv/bin/activate`부터 시작하세요. 터미널을 새로 열면 활성화 명령도 다시 실행합니다.
 
 ```bash
 python3 -m venv .venv
@@ -27,9 +27,20 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-`ensurepip` 오류가 나거나 `uv`로 가상환경을 관리한다면 [README의 uv 설치 절차](../../README.md#웹-실습-앱-실행)를 사용하세요.
+`ensurepip` 오류가 나거나 `uv`로 새 가상환경을 만든다면 아래 명령을 사용하세요.
 
-웹 실습에서는 한 터미널에서 `python app.py`를 실행해 두고 브라우저나 다른 터미널에서 `http://127.0.0.1:5000/`에 접속합니다. 앱을 재시작하면 메모리의 데이터와 세션이 초기화됩니다. Alice와 Bob은 앱에 들어 있는 예제 계정입니다. 접속 방법과 초기 데이터는 [README](../../README.md#웹-실습-앱-실행)에 있습니다.
+```bash
+UV_CACHE_DIR=/tmp/secure-coding-uv-cache uv venv .venv
+UV_CACHE_DIR=/tmp/secure-coding-uv-cache uv pip install --python .venv/bin/python -r requirements.txt
+source .venv/bin/activate
+```
+
+가상환경을 활성화한 터미널에서 `python app.py`를 실행하고 브라우저나 다른 터미널에서 `http://127.0.0.1:5000/`에 접속합니다. 앱을 재시작하면 메모리의 데이터와 세션이 초기화됩니다.
+
+| 예제 계정 | 비밀번호 | 소유한 메모 ID |
+|---|---|---:|
+| `alice` | `alice-lab` | 1 |
+| `bob` | `bob-lab` | 2 |
 
 ## 전체 일정
 

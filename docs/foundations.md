@@ -73,7 +73,7 @@ curl --noproxy '*' -i http://127.0.0.1:5000/session
 
 ## 3주차: 웹 애플리케이션
 
-1. [README](../README.md)에 따라 Flask 앱을 실행합니다.
+1. [웹 보안 과정의 공통 준비](web-security/curriculum.md#공통-준비)에 따라 Flask 앱을 실행합니다.
 2. Alice로 로그인합니다. 개발자 도구 Network에서 `/login`의 POST와 리다이렉트를 관찰합니다.
 3. `/safe/notes/1`에서 본인의 메모를 읽습니다.
 4. [app.py](../app.py)의 `create_app`, `login`, `current_user`, `safe_note`를 따라갑니다.
