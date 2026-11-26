@@ -1,6 +1,6 @@
 # 5주차: Ghidra 정적 분석
 
-[이전: 4주차](week-04.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 6주차](week-06.md)
+[이전: 4주차](week-04.md) · [12주 커리큘럼](curriculum.md) · [다음: 6주차](week-06.md)
 
 이번 주 목표는 **실행하지 않고 문자열·참조·분기·데이터 접근만으로 함수의 역할을 추론**하고, 그 근거를 주소로 남기는 것입니다. 대상은 [05_lookup.c](../../examples/reverse_engineering/05_lookup.c)를 빌드한 `05_lookup_stripped`입니다. **소스는 7절의 대조 단계 전까지 열지 않습니다.**
 

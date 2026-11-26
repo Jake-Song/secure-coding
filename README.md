@@ -2,18 +2,15 @@
 
 입문자를 위한 **주 6~8시간, 12주** 커리큘럼입니다. Linux·네트워크 기초부터 시작해 웹·API 취약점을 재현하고, 소스 코드에서 원인을 찾아 수정·재검증합니다.
 
-- [12주 커리큘럼](docs/curriculum.md): 주차별 목표, 실습, 제출물, 완료 기준
+- [웹 보안 12주 커리큘럼](docs/web-security/curriculum.md): 주차별 개념, 실습, 확인 문제, 제출물
 - [Bandit 시작하기](docs/bandit.md): 첫 SSH 접속, 단계 진행, 기본 명령, 오류 해결
 - [Linux·네트워크 기초 실습](docs/foundations.md): 1~4주차 실행 안내
-- [취약점별 실습 안내](docs/labs.md): 5~11주차 요청과 예상 결과
 - [최종 프로젝트·보고서 양식](docs/report-template.md): 12주차 제출물
 - [C 언어 입문 튜토리얼](docs/c-tutorial.md): 컴파일부터 배열·포인터·메모리·입력 검증·파일 저장까지, 실행 예제 8개
 - [C++ 입문 튜토리얼](docs/cpp-tutorial.md): 참조·문자열·vector·클래스·알고리즘·RAII·입력 검증, 실행 예제 8개
 - [Rust 입문 튜토리얼](docs/rust-tutorial.md): 소유권·빌림·구조체·enum·컬렉션·Result·파일 저장, 실행 예제 8개
-- [역엔지니어링 12주 커리큘럼](docs/reverse-engineering.md): C·메모리부터 ELF 분석, GDB·Ghidra, 파일 형식 복원과 패치까지
-- [역엔지니어링 1~8주차 학습자료](docs/reverse-engineering/week-01.md): 1주차부터 이어지는 주차별 개념·실행 예제·GDB·Ghidra 분석·입력 생성기·Python 재구현·수정 과제·제출물
-- [네트워크 보안 12주 커리큘럼](docs/network-security.md): TCP·DNS·TLS·메시지 인증·접근 정책·로그 탐지
-- [네트워크 보안 실습 코드와 실행 안내](docs/network-labs.md): 로컬 통신과 오프라인 모델로 구성한 여섯 실습
+- [역엔지니어링 12주 커리큘럼](docs/reverse-engineering/curriculum.md): C·메모리부터 ELF 분석, GDB·Ghidra, 파일 형식 복원과 패치까지
+- [네트워크 보안 12주 커리큘럼](docs/network-security/curriculum.md): TCP·DNS·TLS·메시지 인증·접근 정책·로그 탐지
 
 ## 첫 학습: Bandit
 
@@ -91,7 +88,7 @@ python examples/tcp_client.py '안녕하세요'
 python3 -m examples.network_security all
 ```
 
-`framing`, `dns`, `pcap`, `tls`, `auth`, `policy`, `detection`을 개별 명령으로도 실행할 수 있습니다. 실제 TCP·UDP·TLS는 `127.0.0.1`의 임시 포트에서 통신합니다. PCAP과 로그는 합성 데이터이며 접근 정책은 오프라인 모델입니다. 상세한 예상 결과와 수정 과제는 [실습 안내](docs/network-labs.md)에 있습니다.
+`framing`, `dns`, `pcap`, `tls`, `auth`, `policy`, `detection`을 개별 명령으로도 실행할 수 있습니다. 실제 TCP·UDP·TLS는 `127.0.0.1`의 임시 포트에서 통신합니다. PCAP과 로그는 합성 데이터이며 접근 정책은 오프라인 모델입니다. 상세한 예상 결과와 수정 과제는 [네트워크 보안 학습자료](docs/network-security/curriculum.md)에 있습니다.
 
 ```bash
 python3 -m unittest tests.test_network_protocols tests.test_network_auth tests.test_network_tls tests.test_network_policy -v
@@ -105,7 +102,7 @@ python -m unittest discover -s tests -v
 
 테스트는 취약한 동작이 재현되는지, 방어 구현이 공격을 차단하는지, 정상 기능이 유지되는지를 함께 확인합니다. TCP 테스트는 실제 loopback 소켓을 사용합니다. 네트워크가 제한된 환경에서는 웹·경계 예제만 먼저 검사할 수 있습니다.
 
-네트워크 보안 실습 추가 후 전체 **65개 테스트**가 통과했습니다. 초기 웹·경계·TCP·HTTP 예제는 29개, 신규 네트워크 보안은 36개입니다. 실행 환경과 확인 범위는 [검증 기록](docs/validation.md)에 있습니다.
+네트워크 보안 실습 추가 후 전체 **65개 테스트**가 통과했습니다. 초기 웹·경계·TCP·HTTP 예제는 29개, 신규 네트워크 보안은 36개입니다.
 
 ```bash
 python -m unittest tests.test_app tests.test_boundaries -v

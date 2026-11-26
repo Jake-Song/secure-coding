@@ -91,7 +91,7 @@ def create_app(testing=False):
         <li><a href="/safe/search?q=Note">방어한 검색</a></li>
         <li><a href="/vuln/greet?name=Alice">취약한 인사</a></li>
         <li><a href="/safe/greet?name=Alice">방어한 인사</a></li></ul>
-        <p>나머지 실습은 docs/labs.md를 참고하세요.</p></html>
+        <p>나머지 실습은 docs/web-security/curriculum.md를 참고하세요.</p></html>
         """, user=user, token=csrf_token())
 
     @app.get("/session")

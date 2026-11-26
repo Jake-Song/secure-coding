@@ -1,6 +1,6 @@
 # 4주차: 함수 호출과 ELF
 
-[이전: 3주차](week-03.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 5주차](week-05.md)
+[이전: 3주차](week-03.md) · [12주 커리큘럼](curriculum.md) · [다음: 5주차](week-05.md)
 
 이번 주에는 `main`이 `compute`를, `compute`가 `sum_seven`을 호출하는 과정을 따라갑니다. GDB로 인자와 반환값이 어디에 놓이는지, 스택에 어떤 값이 들어가는지 확인합니다. 그런 다음 ELF 실행 파일을 열어 코드와 데이터가 파일의 어디에 저장되고, 실행할 때 메모리의 어느 주소에 놓이는지 연결해 봅니다. [실습 코드 04_elf.c](../../examples/reverse_engineering/04_elf.c)
 

@@ -1,6 +1,6 @@
 # 8주차: 바이트 변환과 재구현
 
-[이전: 7주차](week-07.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 9주차 파일 형식](../reverse-engineering.md#9주차-파일-형식)
+[이전: 7주차](week-07.md) · [12주 커리큘럼](curriculum.md) · [다음: 9주차 파일 형식](curriculum.md#9주차-파일-형식)
 
 이번 주 목표는 **바이트 변환 알고리즘을 명령어에서 복원하고 Python으로 똑같이 재구현**하는 것입니다. "비슷하게"가 아니라 정상·경계·무작위 입력 모두에서 바이트 단위로 같은 결과를 내야 합니다. 대상은 [08_transform.c](../../examples/reverse_engineering/08_transform.c)의 `08_transform`이며, 비교 도구 [compare_transform.py](../../examples/reverse_engineering/compare_transform.py)를 사용합니다.
 

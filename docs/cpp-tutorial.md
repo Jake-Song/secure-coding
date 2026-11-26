@@ -289,4 +289,4 @@ python3 -m unittest tests.test_cpp_rust_tutorials.CppTutorialTests -v
 
 모든 C++ 예제는 경고를 오류로 처리해 빌드합니다. 포인터·참조의 수명 오류는 경고만으로 모두 검출되지 않습니다. GCC/Clang에서 지원한다면 C 튜토리얼의 Sanitizer 실행 방법에 `c++ -std=c++17`과 C++ 파일을 적용해 추가로 점검합니다.
 
-마쳤다면 함수 인자를 값·참조·`const` 참조 중 무엇으로 받을지 설명하고, 객체의 소유자와 파괴 시점을 코드에서 짚어 보세요. 이어서 [Rust 튜토리얼](rust-tutorial.md)에서 소유권을 컴파일러가 검사하는 방식을 비교하거나 [역엔지니어링 과정](reverse-engineering.md)으로 연결할 수 있습니다.
+마쳤다면 함수 인자를 값·참조·`const` 참조 중 무엇으로 받을지 설명하고, 객체의 소유자와 파괴 시점을 코드에서 짚어 보세요. 이어서 [Rust 튜토리얼](rust-tutorial.md)에서 소유권을 컴파일러가 검사하는 방식을 비교하거나 [역엔지니어링 과정](reverse-engineering/curriculum.md)으로 연결할 수 있습니다.

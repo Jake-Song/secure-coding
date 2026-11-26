@@ -420,4 +420,4 @@ python3 -m unittest tests.test_c_tutorial -v
 - 할당·입력 변환·파일 입출력의 실패를 처리할 수 있다.
 - 종합 예제에 기능 하나를 추가하고 정상·오류 입력으로 검증할 수 있다.
 
-다음에는 [C++ 튜토리얼](cpp-tutorial.md)의 참조·컨테이너·RAII나 [Rust 튜토리얼](rust-tutorial.md)의 소유권·빌림과 비교해 봅니다. [역엔지니어링 과정](reverse-engineering.md)의 1~2주차로 이어가 같은 C 코드가 어셈블리와 메모리에서 어떻게 보이는지 관찰할 수도 있습니다.
+다음에는 [C++ 튜토리얼](cpp-tutorial.md)의 참조·컨테이너·RAII나 [Rust 튜토리얼](rust-tutorial.md)의 소유권·빌림과 비교해 봅니다. [역엔지니어링 과정](reverse-engineering/curriculum.md)의 1~2주차로 이어가 같은 C 코드가 어셈블리와 메모리에서 어떻게 보이는지 관찰할 수도 있습니다.

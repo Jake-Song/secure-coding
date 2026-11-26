@@ -1,6 +1,6 @@
 # 1주차: C와 빌드 흐름
 
-[12주 커리큘럼](../reverse-engineering.md) · [다음: 2주차](week-02.md)
+[12주 커리큘럼](curriculum.md) · [다음: 2주차](week-02.md)
 
 이번 주 목표는 C의 입력·출력·분기·배열·함수를 읽고, **소스·어셈블리·오브젝트·실행 파일의 차이**를 설명하는 것입니다. 소스는 [01_build.c](../../examples/reverse_engineering/01_build.c)입니다.
 

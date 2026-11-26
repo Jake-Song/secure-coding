@@ -1,0 +1,21 @@
+# 10주차 SSRF와 API 속성별 인가
+
+[이전 9주차](week-09.md) · [12주 커리큘럼](curriculum.md) · [다음 11주차](week-11.md)
+
+SSRF는 사용자가 제공한 목적지 정보를 서버가 사용해 요청을 보내는 기능에서 발생할 수 있습니다. 네트워크 접근 권한은 서버가 갖고 있으므로 목적지 정책도 서버가 적용해야 합니다. [경계 예제](../../examples/boundaries.py)의 `fetch_fixture`는 URL 문자열을 키로 미리 정한 응답을 돌려주는 모델입니다.
+
+```bash
+python - <<'PY'
+from examples.boundaries import PUBLIC_URL, fetch_fixture
+
+print(fetch_fixture(PUBLIC_URL, safe=True))
+PY
+```
+
+`public catalog`가 출력됩니다. URL 비교는 이 모델의 목적지 정책만 검증합니다. 실제 HTTP 클라이언트에서는 DNS 결과, 리다이렉트 대상, IPv4·IPv6 주소, 연결 시점의 주소, 네트워크 송신 정책까지 검토합니다.
+
+API에서도 클라이언트가 보낸 필드를 서버가 그대로 반영하면 속성별 인가가 빠질 수 있습니다. 이를 mass assignment라고 부릅니다. [앱 코드](../../app.py)의 `safe_profile`에서 **JSON 객체 → `display_name` 한 필드 → 문자열과 길이 확인 → 현재 사용자 행만 갱신**하는 흐름을 따라가세요. 일반 사용자의 수정 가능 속성은 `display_name`이고, 관리자 여부는 서버가 통제합니다.
+
+**확인 문제.** URL이 사용하는 프로토콜을 검사하는 것만으로 접속 대상의 권한까지 결정할 수 있나요? 로그인된 사용자라는 사실은 프로필의 모든 속성에 어떤 수정 권한을 주나요?
+
+**제출물.** 목적지 정책과 프로필 필드 정책을 표로 작성하세요. 정상 이름 변경, 잘못된 타입, 미등록 필드 거부, 관리자 속성 보존을 어떤 테스트로 확인할지 적으세요.

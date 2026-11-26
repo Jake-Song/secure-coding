@@ -1,6 +1,6 @@
 # 7주차: 입력 검증 로직 복원
 
-[이전: 6주차](week-06.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 8주차](week-08.md)
+[이전: 6주차](week-06.md) · [12주 커리큘럼](curriculum.md) · [다음: 8주차](week-08.md)
 
 이번 주 목표는 **여러 단계로 입력을 검사하는 함수의 수락 조건을 완전히 복원**하고, 그 조건을 만족하는 입력을 계산으로 만들어 내는 것입니다. 대상은 `07_validate_stripped`입니다. 소스 [07_validate.c](../../examples/reverse_engineering/07_validate.c)는 8절에서 대조할 때까지 열지 않습니다.
 

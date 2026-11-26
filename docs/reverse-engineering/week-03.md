@@ -1,6 +1,6 @@
 # 3주차: x86-64 명령어와 제어 흐름
 
-[이전: 2주차](week-02.md) · [12주 커리큘럼](../reverse-engineering.md) · [다음: 4주차](week-04.md)
+[이전: 2주차](week-02.md) · [12주 커리큘럼](curriculum.md) · [다음: 4주차](week-04.md)
 
 이번 주 목표는 **명령이 바꾸는 값과 분기가 선택하는 다음 위치**를 추적하는 것입니다. [03_flow.c](../../examples/reverse_engineering/03_flow.c)와 [registers.S](../../examples/reverse_engineering/registers.S)를 사용합니다. x86-64의 Intel 문법만 다룹니다.
 
