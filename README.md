@@ -2,6 +2,7 @@
 
 ## 보안 과정
 
+- [정보보안 종합 커리큘럼](docs/curriculum.md)은 입문자가 40주 동안 메모 서비스를 설계하고 보호하며 탐지·사고 대응·복구까지 실습하는 전체 학습 경로입니다.
 - [웹 보안 과정](docs/web-security/curriculum.md)에서 네트워크 기초, Flask 요청 흐름, Burp, 웹·API 방어와 회귀 테스트를 학습합니다.
 - [네트워크 보안 12주 과정](docs/network-security/curriculum.md)에서 TCP·UDP·DNS, 패킷 읽기, TLS·메시지 인증, 접근 정책과 로그 탐지를 실습합니다.
 - [역엔지니어링 12주 과정](docs/reverse-engineering/curriculum.md)에서 C 빌드, 메모리, x86-64 어셈블리, ELF, GDB·Ghidra 분석을 학습합니다. 1~8주차에는 실행 예제와 단계별 안내가 있습니다.
