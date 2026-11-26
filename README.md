@@ -2,7 +2,7 @@
 
 ## 보안 과정
 
-- [웹 보안 12주 과정](docs/web-security/curriculum.md)에서 Linux·네트워크 기초, Flask 요청 흐름, Burp, 웹·API 방어와 회귀 테스트를 학습합니다.
+- [웹 보안 과정](docs/web-security/curriculum.md)에서 네트워크 기초, Flask 요청 흐름, Burp, 웹·API 방어와 회귀 테스트를 학습합니다.
 - [네트워크 보안 12주 과정](docs/network-security/curriculum.md)에서 TCP·UDP·DNS, 패킷 읽기, TLS·메시지 인증, 접근 정책과 로그 탐지를 실습합니다.
 - [역엔지니어링 12주 과정](docs/reverse-engineering/curriculum.md)에서 C 빌드, 메모리, x86-64 어셈블리, ELF, GDB·Ghidra 분석을 학습합니다. 1~8주차에는 실행 예제와 단계별 안내가 있습니다.
 
@@ -15,5 +15,4 @@
 ## 기초 실습과 보고서
 
 - [Bandit 시작하기](docs/bandit.md)에서 첫 SSH 접속과 기본 파일 탐색 명령을 익힙니다.
-- [1~4주차 기초 실습](docs/foundations.md)에서 Linux 권한, 로컬 TCP 통신, 웹 앱 구조와 요청 관찰을 연습합니다.
 - [최종 프로젝트 보고서 양식](docs/report-template.md)에 정상 동작, 원인, 수정 근거와 검증 결과를 정리합니다.

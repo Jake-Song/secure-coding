@@ -185,4 +185,4 @@ ssh -o IPQoS=throughput -p 2220 bandit0@bandit.labs.overthewire.org
 - [ ] 첫 비밀번호를 찾아 `bandit1`로 접속했다.
 - [ ] 비밀번호를 제외한 풀이 기록을 남겼다.
 
-다음에는 1 → 2와 2 → 3에서 파일명·인자·옵션의 차이를 연습합니다. `bandit10`에 도달한 뒤 [Linux 기초 실습](foundations.md#1주차-linux)에서 권한·프로세스·시스템 콜을 보완하고 네트워크 단계로 넘어갑니다.
+다음에는 1 → 2와 2 → 3에서 파일명·인자·옵션의 차이를 연습합니다. `bandit10`에 도달한 뒤에는 [네트워크 구조와 관찰](network-security/week-01.md)에서 로컬 연결과 프로세스를 관찰할 수 있습니다.

@@ -1,6 +1,6 @@
 # 2주차 네트워크
 
-[이전 1주차](week-01.md) · [12주 커리큘럼](curriculum.md) · [다음 3주차](week-03.md)
+[웹 보안 커리큘럼](curriculum.md) · [다음 3주차](week-03.md)
 
 `http://127.0.0.1:5000/session`에서 `127.0.0.1`은 이 컴퓨터의 주소, `5000`은 앱이 듣는 포트, `/session`은 HTTP 요청 경로입니다. `example.com`처럼 이름으로 접속할 때는 DNS가 IP 주소를 찾는 데 쓰입니다. 이 예시 URL에는 IP 주소가 직접 적혀 있습니다.
 
@@ -27,7 +27,7 @@ python examples/tcp_server.py
 python examples/tcp_client.py '안녕하세요'
 ```
 
-클라이언트의 `shutdown(SHUT_WR)`는 보낼 데이터가 끝났다는 신호입니다. 서버는 수신 EOF를 확인하고 연결을 닫습니다. 클라이언트는 그동안 되돌아온 데이터를 읽고 자기 쪽 수신 EOF까지 기다립니다. 실행 흐름은 [TCP 클라이언트 코드](../../examples/tcp_client.py)와 [기초 실습 2주차](../foundations.md#2주차-네트워크)에서 확인할 수 있습니다.
+클라이언트의 `shutdown(SHUT_WR)`는 보낼 데이터가 끝났다는 신호입니다. 서버는 수신 EOF를 확인하고 연결을 닫습니다. 클라이언트는 그동안 되돌아온 데이터를 읽고 자기 쪽 수신 EOF까지 기다립니다. 실행 흐름은 [TCP 클라이언트 코드](../../examples/tcp_client.py)에서 확인할 수 있습니다.
 
 **실습 B.** 앱을 실행한 상태에서 아래 명령을 실행하세요. `200 OK`, JSON을 나타내는 `Content-Type`, 로그인 전의 `"username":null`을 찾아보세요. 쿠키와 `csrf` 값은 기록에서 가립니다.
 

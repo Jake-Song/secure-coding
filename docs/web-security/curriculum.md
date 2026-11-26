@@ -1,8 +1,8 @@
-# 보안 취약점 분석 및 방어: 12주 커리큘럼
+# 웹 보안 커리큘럼
 
 ## 목표와 학습 방식
 
-**주 6~8시간, 입문자 기준**입니다. Linux·네트워크를 먼저 익히고 웹·API를 중심으로 학습합니다. 최종 목표는 작은 서비스에서 데이터 흐름과 신뢰 경계를 추적하여 취약점을 재현하고, 원인을 설명하며, 수정과 회귀 테스트까지 수행하는 것입니다.
+**주 6~8시간, 입문자 기준**입니다. 네트워크 기초인 2주차부터 시작해 웹·API를 중심으로 학습합니다. 최종 목표는 작은 서비스에서 데이터 흐름과 신뢰 경계를 추적하여 취약점을 재현하고, 원인을 설명하며, 수정과 회귀 테스트까지 수행하는 것입니다.
 
 실습은 자신의 로컬 앱 또는 명시적으로 실습을 허용한 환경에서 진행합니다. 실제 개인정보·운영용 비밀정보 대신 예제 데이터를 사용합니다.
 
@@ -19,7 +19,7 @@
 
 ## 공통 준비
 
-명령은 Linux·macOS 또는 WSL의 저장소 루트에서 실행합니다. 1주차는 Python 환경 없이 시작할 수 있으며, 웹 실습에는 Python 3.10 이상이 필요합니다. `.venv`에 의존성을 설치한 적이 있다면 바로 `source .venv/bin/activate`부터 시작하세요. 터미널을 새로 열면 활성화 명령도 다시 실행합니다.
+명령은 Linux·macOS 또는 WSL의 저장소 루트에서 실행합니다. 웹 실습에는 Python 3.10 이상이 필요합니다. `.venv`에 의존성을 설치한 적이 있다면 바로 `source .venv/bin/activate`부터 시작하세요. 터미널을 새로 열면 활성화 명령도 다시 실행합니다.
 
 ```bash
 python3 -m venv .venv
@@ -46,7 +46,6 @@ source .venv/bin/activate
 
 | 주차 | 주제 | 핵심 개념 | 실습·제출물 | 완료 기준 |
 |---|---|---|---|---|
-| 1 | [Linux 기초](week-01.md) | 파일·권한·사용자·프로세스·입출력·SSH·시스템 콜 | [Bandit 접속부터 시작](../bandit.md), bandit10 진입, [로컬 기초 실습](../foundations.md#1주차-linux) | SSH와 파일 검색을 사용하고 사용자·권한에 따른 접근 결과를 설명 |
 | 2 | [네트워크](week-02.md) | IP·포트·TCP/UDP·DNS·HTTP/HTTPS | [TCP 예제](../../examples/tcp_server.py), 요청 흐름 그림 | 바이트 스트림과 메시지 경계, TCP와 TLS의 역할 구분 |
 | 3 | [웹 앱 구조](week-03.md) | Python·HTML·JS·SQL·라우팅·세션 | [앱](../../app.py)의 로그인·메모 요청 추적, 로컬 안내 라우트 추가 | 브라우저→라우트→DB→응답 경로 설명 |
 | 4 | [분석 도구](week-04.md) | 개발자 도구·Burp Proxy/Repeater·입력·신뢰 경계 | 엔드포인트·입력·인증·인가 목록, 정상 요청 재전송 | 클라이언트 입력과 서버의 신뢰 정보를 구분 |
@@ -59,11 +58,8 @@ source .venv/bin/activate
 | 11 | [코드 리뷰·관찰](week-11.md) | 비밀정보·설정·의존성·비밀번호 저장·로그 | 검토 실습, 발견 사항 분류 | 의도적 취약점·수정할 결함·추가 조사 항목 구분 |
 | 12 | [종합 프로젝트](week-12.md) | 재현→분석→수정→재검증 | [최종 보고서](../report-template.md), 패치, 회귀 테스트 | 취약점 3~5개의 영향과 수정 근거를 코드·실행 결과로 설명 |
 
-## 1~4주차: 기반 만들기
+## 2~4주차 기반 만들기
 
-실행 명령은 [기초 실습 문서](../foundations.md)에 있습니다.
-
-- **1주차:** [Bandit 안내](../bandit.md)로 시작합니다. 오늘은 bandit0 접속과 bandit1 진입을 목표로 하고, 이후 bandit10까지 진행합니다. 명령을 선택한 이유와 실패 원인을 기록한 뒤 로컬 권한·프로세스 실습으로 이어갑니다.
 - **2주차:** 작은 TCP 에코 예제로 연결·송수신·half-close·EOF를 관찰합니다. HTTP의 메서드·상태 코드·헤더·본문을 구분합니다.
 - **3주차:** `create_app`, 로그인, `current_user`, 메모 조회, SQL 실행 코드를 읽습니다. `/about` 같은 읽기 전용 라우트를 직접 추가하고 한글·HTML 특수문자를 출력해 봅니다. 사용자 입력을 그대로 HTML 문자열에 연결하지 않습니다.
 - **4주차:** Burp로 자신의 앱 요청을 반복 전송합니다. 응답 코드만 보지 말고 어떤 계정으로 어떤 데이터가 조회·변경됐는지 확인합니다.
@@ -102,7 +98,6 @@ source .venv/bin/activate
 
 ## 공식 학습 자료
 
-- [OverTheWire Bandit](https://overthewire.org/wargames/bandit/): 초보 Linux·SSH 워게임.
 - [PortSwigger 학습 경로](https://portswigger.net/web-security/learning-paths/): 주제별 설명과 교육용 실습. 본과정에서는 Apprentice 실습부터 진행합니다.
 - [OWASP Juice Shop 공식 가이드](https://pwning.owasp-juice.shop/companion-guide/latest/introduction/README.html): 종합 분석용 교육 앱.
 - [Flask 보안 고려사항](https://flask.palletsprojects.com/en/stable/web-security/): 템플릿·CSRF·쿠키 설정.
