@@ -1,18 +1,40 @@
-# 8주차 CSRF와 세션
+# 8주차 명령어·파일·업로드 경계
 
 [이전 7주차](week-07.md) · [웹 보안 커리큘럼](curriculum.md) · [다음 9주차](week-09.md)
 
-브라우저는 쿠키의 조건이 맞으면 요청에 쿠키를 자동으로 붙입니다. 서버는 로그인 세션을 확인한 뒤, 상태를 바꾸는 요청에 해당 세션의 CSRF 토큰도 있는지 검사할 수 있습니다. 이 앱의 `require_csrf`는 폼 필드 또는 헤더의 값을 세션의 값과 비교합니다. 로그인 성공 시 세션과 CSRF 토큰을 새로 만들고 로그아웃 때 서버 세션을 폐기합니다. [세션과 토큰 코드](../../app.py)
+셸은 명령 문자열에서 인자와 제어 문법을 해석합니다. 고정 프로그램을 호출해야 한다면 실행 파일과 인자를 리스트로 넘겨 각각의 경계를 유지할 수 있습니다. 파일 접근은 경로를 실제 위치로 해석한 뒤 공개 디렉터리 아래에 있는지 검사합니다. 심볼릭 링크가 있으면 입력 이름과 최종 위치가 달라질 수 있습니다.
 
-| 개념 | 확인할 조건 |
-|---|---|
-| Origin | 스킴, 호스트, 포트로 구분합니다. `127.0.0.1:5000`과 `127.0.0.1:5001`은 포트가 달라 서로 다른 origin입니다. |
-| Site와 SameSite | Site는 스킴과 등록 가능한 도메인 등을 기준으로 판단하며, 포트가 달라도 같은 site일 수 있습니다. `SameSite`는 요청 맥락에 따른 쿠키 전송에 관여합니다. |
-| CORS | 브라우저가 다른 origin의 응답을 스크립트에 공유할 수 있는지 정합니다. |
-| CSRF 토큰 | 서버가 상태 변경 요청에 현재 세션과 일치하는 토큰이 있는지 검사합니다. |
+다음 예제는 공백이 있는 문장을 `printf`에 인자 하나로 전달합니다.
 
-브라우저에서 정상 로그인과 로그아웃을 진행하며 `/session`의 `username`이 `null` → `alice` → `null`로 바뀌는 것을 확인하세요. 방어 경로인 `POST /safe/status`의 회귀 테스트 계획에는 **토큰 누락, 틀린 토큰, 다른 세션의 토큰, 올바른 토큰**을 각각 넣습니다. 세 가지 거부 경우에는 `403`과 기존 표시 이름 유지, 정상 경우에는 `200`과 표시 이름 변경을 기대합니다.
+```bash
+python - <<'PY'
+import subprocess
 
-**확인 문제.** 로그인 쿠키가 있어도 상태 변경 요청에서 `403`이 나올 수 있는 이유를 설명하세요.
+subprocess.run(["printf", "%s\n", "hello world"], check=True)
+PY
+```
 
-**제출물.** 로그인·로그아웃 때의 세션 흐름 그림과 토큰 조건별 기대 응답·변경 전후 상태 표를 작성하세요.
+출력은 `hello world` 한 줄입니다. 다음으로 [경계 예제 코드](../../examples/boundaries.py)의 `read_file`과 `save_text_upload`를 읽으세요. 전자는 `resolve()`로 경로를 해석한 뒤 허용 디렉터리 아래인지 확인합니다. 후자는 `.txt`, 1 KiB 제한, UTF-8 디코딩을 검사하고 서버에서 생성한 파일명으로 저장합니다. 아래 예제는 정상 파일 읽기와 저장 결과의 이름을 확인합니다.
+
+```bash
+python - <<'PY'
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from examples.boundaries import read_file, save_text_upload
+
+with TemporaryDirectory() as temporary:
+    root = Path(temporary)
+    (root / "public").mkdir()
+    (root / "public" / "hello.txt").write_text("hello", encoding="utf-8")
+    print(read_file(root, "hello.txt", safe=True))
+    saved = save_text_upload(root / "uploads", "notes.txt", b"hello")
+    print(saved.suffix, saved.name == "notes.txt", saved.read_text(encoding="utf-8"))
+PY
+```
+
+예상 결과는 `hello`와 `.txt False hello`입니다. `False`는 저장 파일명이 클라이언트가 제공한 이름과 다르다는 뜻입니다.
+
+**확인 문제.** 파일 이름, 파일 크기, 텍스트 디코딩은 각각 어느 위험을 줄이나요? 목록 방식으로 명령을 실행할 때 실행 파일과 옵션에는 어떤 값을 허용할지 왜 별도로 판단해야 하나요?
+
+**제출물.** 명령 인자, 파일 경로, 업로드의 검사 위치를 표로 정리하고 정상 파일·공개 범위 밖 경로·심볼릭 링크·비 UTF-8·크기 초과에 대한 기대 동작을 적으세요.

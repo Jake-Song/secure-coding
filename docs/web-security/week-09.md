@@ -1,40 +1,21 @@
-# 9주차 명령어·파일·업로드 경계
+# 9주차 SSRF와 API 속성별 인가
 
 [이전 8주차](week-08.md) · [웹 보안 커리큘럼](curriculum.md) · [다음 10주차](week-10.md)
 
-셸은 명령 문자열에서 인자와 제어 문법을 해석합니다. 고정 프로그램을 호출해야 한다면 실행 파일과 인자를 리스트로 넘겨 각각의 경계를 유지할 수 있습니다. 파일 접근은 경로를 실제 위치로 해석한 뒤 공개 디렉터리 아래에 있는지 검사합니다. 심볼릭 링크가 있으면 입력 이름과 최종 위치가 달라질 수 있습니다.
-
-다음 예제는 공백이 있는 문장을 `printf`에 인자 하나로 전달합니다.
+SSRF는 사용자가 제공한 목적지 정보를 서버가 사용해 요청을 보내는 기능에서 발생할 수 있습니다. 네트워크 접근 권한은 서버가 갖고 있으므로 목적지 정책도 서버가 적용해야 합니다. [경계 예제](../../examples/boundaries.py)의 `fetch_fixture`는 URL 문자열을 키로 미리 정한 응답을 돌려주는 모델입니다.
 
 ```bash
 python - <<'PY'
-import subprocess
+from examples.boundaries import PUBLIC_URL, fetch_fixture
 
-subprocess.run(["printf", "%s\n", "hello world"], check=True)
+print(fetch_fixture(PUBLIC_URL, safe=True))
 PY
 ```
 
-출력은 `hello world` 한 줄입니다. 다음으로 [경계 예제 코드](../../examples/boundaries.py)의 `read_file`과 `save_text_upload`를 읽으세요. 전자는 `resolve()`로 경로를 해석한 뒤 허용 디렉터리 아래인지 확인합니다. 후자는 `.txt`, 1 KiB 제한, UTF-8 디코딩을 검사하고 서버에서 생성한 파일명으로 저장합니다. 아래 예제는 정상 파일 읽기와 저장 결과의 이름을 확인합니다.
+`public catalog`가 출력됩니다. URL 비교는 이 모델의 목적지 정책만 검증합니다. 실제 HTTP 클라이언트에서는 DNS 결과, 리다이렉트 대상, IPv4·IPv6 주소, 연결 시점의 주소, 네트워크 송신 정책까지 검토합니다.
 
-```bash
-python - <<'PY'
-from pathlib import Path
-from tempfile import TemporaryDirectory
+API에서도 클라이언트가 보낸 필드를 서버가 그대로 반영하면 속성별 인가가 빠질 수 있습니다. 이를 mass assignment라고 부릅니다. [앱 코드](../../app.py)의 `safe_profile`에서 **JSON 객체 → `display_name` 한 필드 → 문자열과 길이 확인 → 현재 사용자 행만 갱신**하는 흐름을 따라가세요. 일반 사용자의 수정 가능 속성은 `display_name`이고, 관리자 여부는 서버가 통제합니다.
 
-from examples.boundaries import read_file, save_text_upload
+**확인 문제.** URL이 사용하는 프로토콜을 검사하는 것만으로 접속 대상의 권한까지 결정할 수 있나요? 로그인된 사용자라는 사실은 프로필의 모든 속성에 어떤 수정 권한을 주나요?
 
-with TemporaryDirectory() as temporary:
-    root = Path(temporary)
-    (root / "public").mkdir()
-    (root / "public" / "hello.txt").write_text("hello", encoding="utf-8")
-    print(read_file(root, "hello.txt", safe=True))
-    saved = save_text_upload(root / "uploads", "notes.txt", b"hello")
-    print(saved.suffix, saved.name == "notes.txt", saved.read_text(encoding="utf-8"))
-PY
-```
-
-예상 결과는 `hello`와 `.txt False hello`입니다. `False`는 저장 파일명이 클라이언트가 제공한 이름과 다르다는 뜻입니다.
-
-**확인 문제.** 파일 이름, 파일 크기, 텍스트 디코딩은 각각 어느 위험을 줄이나요? 목록 방식으로 명령을 실행할 때 실행 파일과 옵션에는 어떤 값을 허용할지 왜 별도로 판단해야 하나요?
-
-**제출물.** 명령 인자, 파일 경로, 업로드의 검사 위치를 표로 정리하고 정상 파일·공개 범위 밖 경로·심볼릭 링크·비 UTF-8·크기 초과에 대한 기대 동작을 적으세요.
+**제출물.** 목적지 정책과 프로필 필드 정책을 표로 작성하세요. 정상 이름 변경, 잘못된 타입, 미등록 필드 거부, 관리자 속성 보존을 어떤 테스트로 확인할지 적으세요.

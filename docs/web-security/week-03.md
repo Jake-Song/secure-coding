@@ -1,120 +1,82 @@
-# 3주차 웹 앱 구조
+# 3주차 개발자 도구와 Burp
 
 [이전 2주차](week-02.md) · [웹 보안 커리큘럼](curriculum.md) · [다음 4주차](week-04.md)
 
-라우팅은 HTTP 메서드와 경로에 맞는 Python 함수를 고르는 일입니다. 이번 실습에서는 브라우저의 로그인 요청을 Flask가 받아 처리하는 과정과, 이어진 메모 요청이 SQLite 조회를 거쳐 JSON 응답이 되는 과정을 따라갑니다. 마지막에는 HTML을 반환하는 읽기 전용 화면을 직접 추가합니다.
+개발자 도구는 해당 브라우저의 요청을 보여 줍니다. Burp Proxy는 브라우저와 서버 사이에서 요청과 응답을 기록하고, Repeater는 선택한 요청을 별도로 다시 보냅니다.
 
-## 1. Flask 앱 실행하기
+## 1. 로컬 앱을 띄우고 Burp에 첫 요청 기록하기
 
-WSL 터미널을 열고 `app.py`가 있는 저장소 루트에서 아래 명령을 실행하세요. 처음 실행하는 경우에는 가상환경과 Flask를 먼저 준비합니다. [공통 준비](curriculum.md#공통-준비)
+WSL의 저장소 루트에서 아래 명령을 실행하세요. 이미 `http://127.0.0.1:5000/`에 **로컬 보안 실습**이 열리면 그 서버를 사용합니다. [2주차 실행 안내](week-02.md#1-flask-앱-실행하기)
 
 ```bash
 source .venv/bin/activate
 python app.py
 ```
 
-터미널에 `Running on http://127.0.0.1:5000`이 보이면 서버가 요청을 기다리는 중입니다. 터미널은 켜 둔 채, 브라우저에서 `http://127.0.0.1:5000/`을 여세요. **로컬 보안 실습** 제목과 로그인 폼이 보입니다. 새 터미널에서도 시작 화면의 응답을 확인할 수 있습니다.
+1. Burp에서 **Proxy → Intercept → Open browser**를 누르세요. 버튼에 `Intercept is off`가 보이는 상태에서, 열린 Burp 내장 브라우저로 `http://127.0.0.1:5000/`에 접속하세요. [Burp 내장 브라우저](https://portswigger.net/burp/documentation/desktop/tools/burps-browser)
+2. Burp의 **Proxy → HTTP history**에서 호스트가 `127.0.0.1:5000`이고 URL이 `/`인 `GET` 행을 선택하세요. **Request**에서 메서드와 경로, **Response**에서 상태 `200`과 시작 화면의 HTML을 확인합니다. `Intercept is off` 상태에서도 이 기록이 남습니다. [Burp HTTP history](https://portswigger.net/burp/documentation/desktop/tools/proxy/http-history)
 
-```bash
-curl --noproxy '*' -i http://127.0.0.1:5000/
-```
+기본 연결은 `브라우저 → Burp Proxy(8080) → Flask 앱(5000)`입니다. `8080`은 브라우저 요청을 받는 Burp의 기본 포트입니다. 주소창에는 목적지인 Flask 앱의 `5000`번 포트를 입력합니다. [Burp 프록시 설정](https://portswigger.net/burp/documentation/desktop/settings/tools/proxy)
 
-`-i`는 응답 헤더를 본문과 함께 보여 줍니다. 첫 줄에서 `HTTP/1.0 200 OK`처럼 상태 코드 `200`을 확인하고, 본문에서 로그인 폼 HTML을 찾으세요. 브라우저는 HTML을 읽고 화면에 폼을 그립니다. 서버를 종료하려면 실행한 터미널에서 `Ctrl+C`를 누르세요.
+## 2. 검색 요청을 중간에 멈추고 전달하기
 
-실행할 때 `Port 5000 is in use`가 나오면 먼저 위 주소를 열어 이미 **로컬 보안 실습** 화면이 떠 있는지 확인하세요. 같은 앱이라면 그 서버에서 실습을 이어갈 수 있습니다. 다른 프로그램이 사용 중이라면 WSL에서 `ss -ltnp 'sport = :5000'`으로 포트를 쓰는 프로세스를 확인하세요.
+1. Burp의 **Proxy → Intercept**에서 버튼을 눌러 `Intercept is on`으로 바꾸세요.
+2. 내장 브라우저의 주소창에 `http://127.0.0.1:5000/safe/search?q=Note`를 입력하세요. 요청이 Burp에서 멈춰 있는 동안 브라우저는 응답을 기다립니다.
+3. **Intercept** 화면에서 `/safe/search?q=Note` 요청을 찾아 `GET`, 목적지 `127.0.0.1:5000`, 검색어 `q=Note`를 확인하세요. **Forward**를 눌러 서버로 전달합니다. 이후 `Intercept is off`로 돌리고 브라우저에 `Notebook` 검색 결과가 표시되는지 보세요. [Burp Proxy의 Intercept와 Forward](https://portswigger.net/burp/documentation/desktop/tools/proxy/intercept-messages)
 
-## 2. 로그인 요청과 리다이렉트 관찰하기
+이 단계에서 본 것은 브라우저가 서버로 **보내려던 요청**입니다. 전달한 뒤 **HTTP history**에서 그 요청과 **서버가 돌려준 응답**을 함께 비교할 수 있습니다.
 
-1. 브라우저에서 `F12`를 눌러 개발자 도구를 열고 **Network** 탭을 선택하세요. **Preserve log**를 켜 두면 다음 페이지로 이동한 뒤에도 로그인 요청이 목록에 남습니다. [Chrome DevTools Network 안내](https://developer.chrome.com/docs/devtools/network/reference/)
-2. 시작 화면을 새로 고치고 **로그인**을 누르세요. 예제 폼에는 계정 `alice`와 비밀번호 `alice-lab`이 채워져 있습니다. 이미 로그인한 상태라면 로그아웃하고 다시 시작하세요.
-3. Network 목록에서 `login` 행을 열고 **Headers → General**에서 메서드 `POST`와 상태 코드 `302`를 확인하세요. **Payload → Form Data**에서 `username`, `password`, `csrf` 필드를 찾으세요. `csrf`는 시작 화면의 숨은 폼 필드에서 함께 전송됩니다.
-4. 같은 행의 **Response Headers**에서 `Location: /`와 `Set-Cookie`를 찾으세요. `Location: /`를 받은 브라우저가 `GET /`를 다시 보내면 `200 OK` 응답에 `로그인: alice`가 표시됩니다. 비밀번호, 쿠키 값, 토큰은 화면이나 요청을 공유할 때 가립니다.
+## 3. Repeater에서 검색어 하나만 바꿔 보기
 
-| 순서 | 요청 | 응답 | 의미 |
-|---:|---|---|---|
-| 1 | `GET /` | `200` | 로그인 폼 HTML을 받습니다. |
-| 2 | `POST /login` | `302` | 로그인 처리를 마친 서버가 쿠키를 설정하고 `/`로 다시 이동하라고 응답합니다. |
-| 3 | `GET /` | `200` | 새 쿠키를 보낸 브라우저가 로그인 상태의 HTML을 받습니다. |
+1. **Proxy → HTTP history**에서 방금 보낸 `GET /safe/search?q=Note` 행을 우클릭하고 **Send to Repeater**를 누르세요.
+2. **Repeater** 탭에서 복사된 요청을 보고 **Send**를 누르세요. 요청 첫 줄은 `GET /safe/search?q=Note HTTP/1.1`과 같은 형태입니다. **Response**의 `200`과 `Notebook`이 기준 결과입니다. [Burp Repeater에서 HTTP 요청 보내기](https://portswigger.net/burp/documentation/desktop/tools/repeater/http-messages)
+3. **Request** 첫 줄의 `q=Note`를 `q=Pencil`로 바꾸고 다시 **Send**를 누르세요. 같은 자리를 `q=Zebra`로 바꿔 한 번 더 실행합니다. 검색어만 바꿔야 응답 차이를 해당 입력과 연결할 수 있습니다.
 
-## 3. 본인 메모를 조회하고 코드에서 요청 따라가기
+| 첫 줄에서 보낼 검색어 | 예상 상태 | 예상 응답 본문 |
+|---|---:|---|
+| `q=Note` | `200` | `[{"id":1,"name":"Notebook"}]` |
+| `q=Pencil` | `200` | `[{"id":2,"name":"Pencil"}]` |
+| `q=Zebra` | `200` | `[]` |
 
-Alice로 로그인한 **같은 브라우저**에서 `http://127.0.0.1:5000/safe/notes/1`을 여세요. Network의 새 요청 행을 클릭하면 `GET`, `200`, `Content-Type: application/json`을 확인할 수 있습니다. **Response**에는 다음 JSON이 표시됩니다.
+`200`은 서버가 검색 요청을 처리했다는 뜻입니다. 검색에 맞는 상품이 있는지는 JSON 본문을 보고 판단합니다. `safe_search()`가 `request.args`에서 `q`를 읽어 SQLite에 검색값으로 넘기는 부분도 찾아보세요. [검색 코드](../../app.py)
 
-```json
-{"body":"Alice private memo","id":1,"owner_id":1}
-```
+## 4. 브라우저의 로그인 상태가 요청에 담기는 위치 확인하기
 
-`id`는 메모 번호, `owner_id`는 소유자의 사용자 번호, `body`는 본문입니다. 새 터미널에서 아래 명령을 실행하면 브라우저 세션 쿠키 없이 같은 메모를 요청하므로 `401 UNAUTHORIZED`가 반환됩니다. 이 차이로 로그인 상태가 요청에 어떻게 전달되는지 확인할 수 있습니다.
+Burp 내장 브라우저에서 [2주차 정상 로그인](week-02.md#2-로그인-요청과-리다이렉트-관찰하기)을 하고 `http://127.0.0.1:5000/safe/notes/1`에서 Alice의 본인 메모를 여세요. **HTTP history**에서 해당 행을 선택해 다음 세 값을 비교합니다.
 
-```bash
-curl --noproxy '*' -i http://127.0.0.1:5000/safe/notes/1
-```
-
-[app.py](../../app.py)에서 아래 함수를 찾아, 개발자 도구에서 본 동작과 연결하세요.
-
-| 함수 | 코드에서 찾아볼 부분 |
-|---|---|
-| `create_app()` | Flask 앱을 만들고 메모리 SQLite에 `users`, `notes`와 실습 데이터를 넣습니다. |
-| `login()` | `request.form`의 사용자 이름으로 사용자 행을 찾고 비밀번호를 검사합니다. 성공하면 새 세션 식별자 `sid`를 만들고 `active_sessions[sid]`에 사용자 ID를 저장한 뒤 `redirect("/")`를 반환합니다. |
-| `current_user()` | Flask가 서명된 세션 쿠키에서 읽은 `sid`로 `active_sessions`를 조회합니다. 그 사용자 ID로 SQLite에서 사용자 행을 찾습니다. |
-| `safe_note(note_id)` | `@login_required` 검사를 거쳐, 경로의 메모 ID와 로그인한 사용자의 ID를 SQLite 쿼리의 `id`와 `owner_id` 조건에 각각 넣습니다. 일치하는 행을 `jsonify`로 반환합니다. |
-
-로그아웃하면 서버가 `active_sessions`에서 해당 `sid`를 지웁니다. 확인하려면 시작 화면으로 돌아가 **로그아웃**한 뒤 `http://127.0.0.1:5000/session`을 여세요. 응답에서 `username`이 `null`로 돌아옵니다.
-
-## 4. 시작 화면의 취약한 링크와 방어한 링크 비교하기
-
-시작 화면에는 메모 조회, 상품 검색, 인사 페이지가 각각 두 구현으로 연결돼 있습니다. 링크를 클릭하면 브라우저가 `GET` 요청을 보냅니다. `/vuln/`은 취약한 구현, `/safe/`는 같은 기능에 방어를 적용한 구현입니다. 아래 순서로 **예제 계정의 본인 메모와 기본 입력**을 사용해 각 쌍을 열어 보세요.
-
-1. `http://127.0.0.1:5000/`에서 **Network** 탭과 **Preserve log**를 켜세요. Alice로 로그인한 상태라면 로그아웃하고, `bob` / `bob-lab`으로 로그인하세요. 화면의 `로그인: bob`을 확인하면 메모 2를 소유한 계정으로 실습 중입니다.
-2. **취약한 Bob 메모 조회**를 누르세요. `GET /vuln/notes/2`의 **Response**에서 `id: 2`, `owner_id: 2`, `body: Bob private memo`를 확인하세요. 브라우저의 뒤로 가기로 시작 화면에 돌아와 **방어한 Bob 메모 조회**를 누르면 `GET /safe/notes/2`에서도 같은 본인 메모가 나옵니다.
-3. 시작 화면으로 돌아올 때마다 아래 표의 검색과 인사 링크를 쌍으로 열어 보세요. Network에서 **Headers**의 요청 경로·상태 코드와 **Response**의 본문을 확인합니다.
-
-| 시작 화면의 링크 쌍 | 요청 경로와 쿼리 | 정상 결과 |
+| 확인 대상 | 어디에서 보나요? | 의미 |
 |---|---|---|
-| 취약한 / 방어한 Bob 메모 조회 | `/vuln/notes/2`, `/safe/notes/2` | `200`, Bob의 메모 2를 담은 JSON |
-| 취약한 / 방어한 검색 | `/vuln/search?q=Note`, `/safe/search?q=Note` | `200`, `[{"id":1,"name":"Notebook"}]` JSON |
-| 취약한 / 방어한 인사 | `/vuln/greet?name=Alice`, `/safe/greet?name=Alice` | `200`, 화면에 `Hello, Alice`가 표시되는 HTML |
+| 메모 ID `1` | **Request** 첫 줄의 `/safe/notes/1` | 브라우저가 요청한 객체 번호 |
+| 세션 쿠키 | **Request**의 `Cookie` 헤더 | 서버가 로그인 상태를 확인하는 데 사용하는 값 |
+| `id`와 `owner_id` | **Response**의 JSON | 서버가 반환한 메모 번호와 소유자 번호 |
 
-`/notes/2`의 `2`는 **경로 변수**이고, `q=Note`와 `name=Alice`는 `?` 뒤에 오는 **쿼리 파라미터**입니다. 정상 요청에서는 두 구현의 결과가 같으므로, 차이는 [app.py](../../app.py)의 서버 코드에서 확인합니다. 저장소 루트에서 아래 명령으로 함수 위치를 찾을 수 있습니다.
+서버는 URL에서 메모 ID를 읽고, 세션을 확인한 뒤 로그인 사용자의 ID를 얻습니다. 이 두 값을 소유권 조회의 조건으로 사용합니다.
 
-```bash
-rg -n 'def (vulnerable|safe)_(note|search|greet)\(' app.py
-```
+## 5. Burp 기록과 코드로 취약점 근거 확인하기
 
-| 기능 | 취약한 구현의 처리 | 방어한 구현의 처리 |
+1. Burp 내장 브라우저에서 [2주차의 링크 비교](week-02.md#4-시작-화면의-취약한-링크와-방어한-링크-비교하기)를 진행하세요. Bob의 본인 메모, `Note` 검색, `Alice` 인사를 열고 **HTTP history**에서 취약한 링크와 방어한 링크의 정상 요청을 찾습니다.
+2. 각 요청의 **Request**에서 `/notes/2`의 경로 변수 `2`, 검색의 `q`, 인사의 `name`을 찾으세요. **Response**에서 상태 코드와 응답 형식을 적습니다. 이 기록은 어떤 값이 서버에 들어가는지 보여 주는 출발점입니다.
+3. [app.py](../../app.py)에서 해당 요청을 처리하는 함수로 이동해 그 값이 어디까지 전달되는지 따라가세요. 두 구현에서 아래 조건을 확인하면 각 취약점의 코드 근거를 찾을 수 있습니다.
+
+| 화면의 링크 | 코드에서 확인할 근거 | 판정 |
 |---|---|---|
-| 메모 조회 | 로그인은 확인하지만 조회 조건에는 메모 `id`만 들어갑니다. | 로그인 사용자의 `owner_id`도 조회 조건에 넣습니다. [5주차 객체 접근 제어](week-05.md) |
-| 검색 | 검색어 `q`를 SQL 문자열에 직접 붙여, 입력이 SQL 문법에 영향을 줄 수 있습니다. | SQL에 `LIKE ?`를 두고 검색어를 별도 값으로 바인딩합니다. [6주차 파라미터 바인딩](week-06.md) |
-| 인사 | `name`을 응답 HTML에 직접 붙여, 브라우저가 입력을 HTML 구조로 해석할 수 있습니다. | `{{ name }}` 템플릿 변수에 넣어 HTML 텍스트 문맥에서 이스케이프합니다. [7주차 XSS와 출력 문맥](week-07.md) |
+| Bob 메모 조회 | `vulnerable_note()`의 `@login_required`는 로그인 여부를 확인합니다. 이어지는 쿼리에는 메모 `id`만 들어갑니다. `safe_note()`는 인증된 사용자의 ID를 `owner_id` 조건에도 전달합니다. | **IDOR.** 메모 조회 시 객체 소유권 검사가 빠져 있습니다. |
+| 검색 | `vulnerable_search()`에서는 `request.args`의 `q`가 SQL 문자열에 합쳐진 뒤 `db.execute()`로 전달됩니다. `safe_search()`에는 고정된 `LIKE ?`와 별도로 전달하는 검색값이 있습니다. | **SQL 인젝션 위험.** 검색값이 SQL 문법에 영향을 줄 수 있습니다. |
+| 인사 | `vulnerable_greet()`는 `name`을 응답 HTML 문자열에 바로 연결합니다. `safe_greet()`는 `{{ name }}`에 값을 넘겨 HTML 텍스트 문맥에서 이스케이프합니다. | **반사형 XSS 위험.** 요청 파라미터가 브라우저에서 해석할 HTML의 일부가 될 수 있습니다. |
 
-## 5. 읽기 전용 `/about` 만들기
+예를 들어 검색 링크의 기록은 `q=Note → 200 → Notebook`으로 적으세요. 이어서 `vulnerable_search()`에서 `q`가 쿼리 문자열에 들어가는 줄, `safe_search()`에서 `q`가 바인딩 값으로 전달되는 줄을 나란히 적으세요. 상태 코드가 같아도 두 코드가 입력을 다루는 방식은 다릅니다.
 
-1. [app.py](../../app.py)에서 `@app.get("/session")`을 찾으세요. 그 줄 **바로 위에** 아래 코드를 넣습니다. 기존 라우트와 같은 깊이인 공백 네 칸으로 시작해야 `create_app()` 안에서 등록됩니다. `render_template_string`은 파일 상단에서 이미 가져옵니다.
+### 방어 경로의 결과 확인하기
 
-   ```python
-       @app.get("/about")
-       def about():
-           return render_template_string(
-               """<!doctype html>
-               <html lang="ko">
-               <head><meta charset="utf-8"><title>실습 안내</title></head>
-               <body><h1>{{ title }}</h1></body>
-               </html>""",
-               title="메모 & 검색 <연습>",
-           )
-   ```
+- **메모 소유권.** 저장소 루트의 가상환경에서 아래 테스트를 실행하세요. `OK`이면 본인 메모는 조회되고 타인 메모는 `404`로 거부되는 조건을 확인한 것입니다. [소유권 회귀 테스트](../../tests/test_app.py)
 
-2. 파일을 저장하세요. 서버를 띄운 터미널에서 `Ctrl+C`를 누르고 `python app.py`로 다시 실행합니다. 브라우저에서 `http://127.0.0.1:5000/about`을 열면 화면에 **메모 & 검색 <연습>**이 표시됩니다.
-3. 별도 터미널에서 아래 명령으로 원본 응답을 확인하세요.
+  ```bash
+  python -m unittest tests.test_app.WebLabTests.test_safe_idor_allows_owner_and_blocks_other_user -v
+  ```
 
-   ```bash
-   curl --noproxy '*' -i http://127.0.0.1:5000/about
-   ```
+- **검색값 처리.** 3절에서 캡처한 `/safe/search` 요청을 Repeater에서 열고 쿼리를 `q=O%27Reilly`로 바꿔 보내세요. `%27`은 따옴표 한 글자입니다. `O'Reilly`라는 검색어에 맞는 상품이 없으므로 예상 결과는 `200`과 `[]`입니다.
+- **HTML 이스케이프.** Burp 브라우저에서 `http://127.0.0.1:5000/safe/greet?name=R%26D`를 여세요. `%26`은 `&` 한 글자입니다. 화면의 `Hello, R&D`와 **HTTP history → Response** 원본의 `<p>Hello, R&amp;D</p>`를 비교하세요.
 
-   예상 상태는 `200 OK`이고, 본문의 제목은 `<h1>메모 &amp; 검색 &lt;연습&gt;</h1>`입니다. Flask는 템플릿 변수의 특수문자를 HTML에서 텍스트로 읽히는 표현으로 바꿉니다. 브라우저는 `&amp;`를 `&`로, `&lt;`와 `&gt;`를 `<`와 `>`로 화면에 표시합니다. [Flask 템플릿 안내](https://flask.palletsprojects.com/en/stable/templating/#jinja-setup)
+**확인 문제.** `q=Note`와 `q=Zebra`가 모두 `200`일 때 검색 결과의 차이는 어디에서 보나요? `/safe/notes/1`에 대한 `200`과 함께 요청한 계정과 응답의 메모 ID를 기록하면 무엇을 확인할 수 있나요?
 
-`/about`이 `404`를 반환하면 라우트의 들여쓰기와 서버를 재시작했는지 확인하세요. 서버를 재시작하면 메모리 데이터베이스와 세션이 초기화되므로, 메모 조회를 다시 실습할 때는 로그인부터 진행합니다.
-
-**확인 문제.** `/safe/notes/1`의 `1`과 SQL의 `owner_id`에 들어가는 사용자 ID는 각각 어디에서 오나요? 검색 링크의 `q`는 두 구현에서 SQLite에 어떻게 전달되나요? `/about`의 화면과 응답 HTML에서 같은 문자가 다르게 보이는 이유는 무엇인가요?
-
-**제출물.** 로그인과 메모 조회의 요청·응답 흐름을 `브라우저 → Flask 라우트 → SQLite → 응답` 순서로 그리세요. `/about`은 상태 코드, 응답 HTML의 `<h1>` 한 줄, 화면에 표시된 제목을 함께 기록하세요.
+**제출물.** Repeater에서 검색어 세 개를 넣어 얻은 상태 코드와 응답 본문을 기록하세요. 메모 조회는 메서드·경로·입력·인증·인가를 열로 둔 표를 준비합니다. 링크 세 개에 대해 Burp에서 본 입력, 취약점의 근거가 되는 코드 줄, 방어 경로의 예상과 실제 결과도 적으세요. 쿠키, 비밀번호, 토큰은 가립니다.
