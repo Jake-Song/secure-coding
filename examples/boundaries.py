@@ -1,4 +1,4 @@
-"""Chapter 8~9: 고정 입력·임시 파일·가상 서비스로 신뢰 경계를 비교한다."""
+"""ch 8~9: 고정 입력·임시 파일·가상 서비스로 신뢰 경계를 비교한다."""
 from pathlib import Path
 import secrets
 import subprocess

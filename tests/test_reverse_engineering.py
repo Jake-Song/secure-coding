@@ -194,7 +194,7 @@ class ReverseEngineeringTests(unittest.TestCase):
                          r"\b64 OBJECT\s+LOCAL\s+DEFAULT\s+\d+ accounts\b")
 
     def test_lookup_table_records_point_to_rodata_names(self):
-        # Chapter 5: 16-byte records in .data.rel.ro hold relocated name pointers.
+        # ch 5: 16-byte records in .data.rel.ro hold relocated name pointers.
         name = "05_lookup_stripped"
         sections = {}
         for line in self.elf("-SW", name).splitlines():
@@ -249,7 +249,7 @@ class ReverseEngineeringTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual([int(line) for line in result.stdout.split()], list(stages.values()))
 
-        # The Chapter 7 generator method: decode the prefix, compute the last byte.
+        # The ch 7 generator method: decode the prefix, compute the last byte.
         allowed = (string.ascii_lowercase + string.digits).encode()
         prefix = bytes(((code - 3 * index) & 0xFF) ^ 0x5A
                        for index, code in enumerate(bytes.fromhex("363e3e76")))
