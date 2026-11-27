@@ -1,6 +1,6 @@
-# 2주차 TCP와 메시지 경계
+# Chapter 2 TCP와 메시지 경계
 
-[이전 1주차](week-01.md) · [12주 커리큘럼](curriculum.md) · [다음 3주차](week-03.md)
+[이전 Chapter 1](chapter-01.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 3](chapter-03.md)
 
 ## 바이트 스트림에서 메시지 꺼내기
 

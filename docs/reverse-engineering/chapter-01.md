@@ -1,12 +1,12 @@
-# 1주차: C와 빌드 흐름
+# Chapter 1: C와 빌드 흐름
 
-[12주 커리큘럼](curriculum.md) · [다음: 2주차](week-02.md)
+[역엔지니어링 커리큘럼](curriculum.md) · [다음: Chapter 2](chapter-02.md)
 
-이번 주 목표는 C의 입력·출력·분기·배열·함수를 읽고, **소스·어셈블리·오브젝트·실행 파일의 차이**를 설명하는 것입니다. 소스는 [01_build.c](../../examples/reverse_engineering/01_build.c)입니다.
+이 Chapter 목표는 C의 입력·출력·분기·배열·함수를 읽고, **소스·어셈블리·오브젝트·실행 파일의 차이**를 설명하는 것입니다. 소스는 [01_build.c](../../examples/reverse_engineering/01_build.c)입니다.
 
 ## 0. 과정 시작 전 준비
 
-1~8주차 자료의 명령은 별도 표시가 없으면 **저장소 루트**에서 실행합니다. 기준 환경은 x86-64 Linux 또는 WSL2입니다. ARM 머신은 x86-64 Linux 가상 머신을 사용합니다.
+Chapter 1~8 자료의 명령은 별도 표시가 없으면 **저장소 루트**에서 실행합니다. 기준 환경은 x86-64 Linux 또는 WSL2입니다. ARM 머신은 x86-64 Linux 가상 머신을 사용합니다.
 
 ```bash
 uname -m
@@ -18,14 +18,14 @@ make -C examples/reverse_engineering
 python3 -m unittest tests.test_reverse_engineering -v
 ```
 
-`uname -m`은 `x86_64`여야 합니다. 도구가 없으면 Ubuntu/Debian 실습 머신에서 `sudo apt install build-essential binutils file gdb python3`로 설치합니다. Ghidra는 5주차 전에 [공식 설치 안내](https://github.com/NationalSecurityAgency/ghidra#install)대로 준비합니다.
+`uname -m`은 `x86_64`여야 합니다. 도구가 없으면 Ubuntu/Debian 실습 머신에서 `sudo apt install build-essential binutils file gdb python3`로 설치합니다. Ghidra는 Chapter 5 전에 [공식 설치 안내](https://github.com/NationalSecurityAgency/ghidra#install)대로 준비합니다.
 
-빌드 결과는 `examples/reverse_engineering/build/`에 생깁니다. 기본 옵션 `-O0 -g -fno-omit-frame-pointer -fPIE -pie`는 최적화를 줄이고 디버그 정보를 남기면서 PIE 주소 변화를 관찰하기 위한 설정입니다. 4주차에는 non-PIE 비교본, 5·7주차에는 심볼을 지운 `_stripped` 사본을 함께 만듭니다. 자동 테스트는 빌드·동작·ELF 속성만 확인하며, GDB·Ghidra 관찰은 각 주차 절차로 직접 수행합니다.
+빌드 결과는 `examples/reverse_engineering/build/`에 생깁니다. 기본 옵션 `-O0 -g -fno-omit-frame-pointer -fPIE -pie`는 최적화를 줄이고 디버그 정보를 남기면서 PIE 주소 변화를 관찰하기 위한 설정입니다. Chapter 4에는 non-PIE 비교본, Chapter 5·7에는 심볼을 지운 `_stripped` 사본을 함께 만듭니다. 자동 테스트는 빌드·동작·ELF 속성만 확인하며, GDB·Ghidra 관찰은 각 Chapter 절차로 직접 수행합니다.
 
-매주 같은 양식으로 보고서를 남깁니다. 개인 기록은 Git에서 제외된 `notes/private/`에 둘 수 있습니다.
+Chapter마다 같은 양식으로 보고서를 남깁니다. 개인 기록은 Git에서 제외된 `notes/private/`에 둘 수 있습니다.
 
 ```text
-주차 / 날짜:
+Chapter / 날짜:
 환경: OS, uname -m, GCC·Binutils·GDB(·Ghidra) 버전
 대상: 소스 경로, 빌드 명령, 실행 파일 SHA-256 (sha256sum 결과)
 분석 질문 / 실행 전 예측:
@@ -167,7 +167,7 @@ strings -a examples/reverse_engineering/build/01_build
 objdump -d -M intel --disassemble=check examples/reverse_engineering/build/01_build
 ```
 
-직접 링크한 버전도 같은 성공 출력을 내야 합니다. `strings`에 있는 `trace`, `accepted`가 데이터라는 점을 확인합니다. 문자열이 존재한다는 사실만으로 판정 로직을 다 설명한 것은 아니므로 소스의 사용 지점과 연결합니다. 디스어셈블의 명령을 모두 읽는 것은 3주차 목표입니다.
+직접 링크한 버전도 같은 성공 출력을 내야 합니다. `strings`에 있는 `trace`, `accepted`가 데이터라는 점을 확인합니다. 문자열이 존재한다는 사실만으로 판정 로직을 다 설명한 것은 아니므로 소스의 사용 지점과 연결합니다. 디스어셈블의 명령을 모두 읽는 것은 Chapter 3 목표입니다.
 
 ## 5. 수정 과제
 
@@ -193,4 +193,4 @@ objdump -d -M intel --disassemble=check examples/reverse_engineering/build/01_bu
 3. 배열을 함수 인자로 전달하면 보통 첫 원소를 가리키는 포인터로 변환됩니다. 따라서 `sum_scores`의 `scores`는 배열 전체가 아니라 첫 `int`의 주소이고, 원소 수는 별도 인자 `count`로 전달합니다. 함수 안에서 `sizeof scores`를 해도 원소 수가 아니라 포인터 크기입니다.
 4. 이 예제에서 입력 판정 성공은 종료 코드 `0`, 판정 실패는 `1`, 인자 개수가 잘못된 사용은 사용법을 표준 오류에 출력하고 `2`를 반환합니다. `0`은 보통 성공을 뜻하는 관례지만, `1`과 `2`의 구체적인 의미는 프로그램이 정합니다. 실행 직후 셸에서 `echo $?`를 입력하면 종료 코드를 확인할 수 있습니다.
 
-1주차에서는 `check`의 입력과 반환값, 그리고 위 빌드·자료형 개념을 설명할 수 있으면 다음 단계로 넘어갑니다.
+Chapter 1에서는 `check`의 입력과 반환값, 그리고 위 빌드·자료형 개념을 설명할 수 있으면 다음 단계로 넘어갑니다.

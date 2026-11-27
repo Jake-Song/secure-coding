@@ -1,6 +1,6 @@
-# 11주차 통합 설계와 첫 실행
+# Chapter 11 통합 설계와 첫 실행
 
-[이전 10주차](week-10.md) · [12주 커리큘럼](curriculum.md) · [다음 12주차](week-12.md)
+[이전 Chapter 10](chapter-10.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 12](chapter-12.md)
 
 ## 어느 단계에서 무엇을 결정하는가
 

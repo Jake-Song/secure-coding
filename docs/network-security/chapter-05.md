@@ -1,6 +1,6 @@
-# 5주차 TLS와 신뢰
+# Chapter 5 TLS와 신뢰
 
-[이전 4주차](week-04.md) · [12주 커리큘럼](curriculum.md) · [다음 6주차](week-06.md)
+[이전 Chapter 4](chapter-04.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 6](chapter-06.md)
 
 ## 연결 주소와 인증서 이름
 

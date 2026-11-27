@@ -1,6 +1,6 @@
-# 5주차 SQL 인젝션과 파라미터 바인딩
+# Chapter 5 SQL 인젝션과 파라미터 바인딩
 
-[이전 4주차](week-04.md) · [웹 보안 커리큘럼](curriculum.md) · [다음 6주차](week-06.md)
+[이전 Chapter 4](chapter-04.md) · [웹 보안 커리큘럼](curriculum.md) · [다음 Chapter 6](chapter-06.md)
 
 SQLite는 SQL 문자열을 쿼리 문법으로 해석합니다. 사용자 입력을 그 문자열에 이어 붙이면 입력까지 문법에 영향을 줄 수 있습니다. `safe_search`는 `WHERE name LIKE ?`의 `?` 자리에 검색값을 별도 인자로 전달합니다. 검색값이 달라져도 SQL 문장의 구조는 유지됩니다. [검색 코드](../../app.py)
 

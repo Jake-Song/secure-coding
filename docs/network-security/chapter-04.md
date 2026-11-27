@@ -1,6 +1,6 @@
-# 4주차 UDP·DNS와 응답 검증
+# Chapter 4 UDP·DNS와 응답 검증
 
-[이전 3주차](week-03.md) · [12주 커리큘럼](curriculum.md) · [다음 5주차](week-05.md)
+[이전 Chapter 3](chapter-03.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 5](chapter-05.md)
 
 ## 한 질문과 한 응답 연결하기
 

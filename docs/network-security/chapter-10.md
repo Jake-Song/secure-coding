@@ -1,6 +1,6 @@
-# 10주차 로그와 탐지
+# Chapter 10 로그와 탐지
 
-[이전 9주차](week-09.md) · [12주 커리큘럼](curriculum.md) · [다음 11주차](week-11.md)
+[이전 Chapter 9](chapter-09.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 11](chapter-11.md)
 
 ## 로그 여러 줄에서 한 경보 만들기
 

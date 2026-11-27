@@ -1,6 +1,6 @@
-# 7주차 네트워크 분리와 접근 정책
+# Chapter 7 네트워크 분리와 접근 정책
 
-[이전 6주차](week-06.md) · [12주 커리큘럼](curriculum.md) · [다음 8주차](week-08.md)
+[이전 Chapter 6](chapter-06.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 8](chapter-08.md)
 
 ## 필요한 방향만 열기
 

@@ -1,6 +1,6 @@
-# 6주차 메시지 인증과 재전송
+# Chapter 6 메시지 인증과 재전송
 
-[이전 5주차](week-05.md) · [12주 커리큘럼](curriculum.md) · [다음 7주차](week-07.md)
+[이전 Chapter 5](chapter-05.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 7](chapter-07.md)
 
 ## HMAC, 시간, nonce가 하는 일
 

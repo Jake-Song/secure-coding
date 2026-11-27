@@ -1,8 +1,8 @@
-# 8주차: 바이트 변환과 재구현
+# Chapter 8: 바이트 변환과 재구현
 
-[이전: 7주차](week-07.md) · [12주 커리큘럼](curriculum.md) · [다음: 9주차 파일 형식](curriculum.md#9주차-파일-형식)
+[이전: Chapter 7](chapter-07.md) · [역엔지니어링 커리큘럼](curriculum.md) · [다음: Chapter 9 파일 형식](curriculum.md#chapter-9-파일-형식)
 
-이번 주 목표는 **바이트 변환 알고리즘을 명령어에서 복원하고 Python으로 똑같이 재구현**하는 것입니다. "비슷하게"가 아니라 정상·경계·무작위 입력 모두에서 바이트 단위로 같은 결과를 내야 합니다. 대상은 [08_transform.c](../../examples/reverse_engineering/08_transform.c)의 `08_transform`이며, 비교 도구 [compare_transform.py](../../examples/reverse_engineering/compare_transform.py)를 사용합니다.
+이 Chapter 목표는 **바이트 변환 알고리즘을 명령어에서 복원하고 Python으로 똑같이 재구현**하는 것입니다. "비슷하게"가 아니라 정상·경계·무작위 입력 모두에서 바이트 단위로 같은 결과를 내야 합니다. 대상은 [08_transform.c](../../examples/reverse_engineering/08_transform.c)의 `08_transform`이며, 비교 도구 [compare_transform.py](../../examples/reverse_engineering/compare_transform.py)를 사용합니다.
 
 이번 대상은 함수 하나만 분석하므로 디버그 빌드를 사용합니다. 대신 **C 소스는 재구현이 비교를 통과할 때까지 열지 않습니다**.
 
@@ -76,7 +76,7 @@ python3 -c 'import sys; sys.stdout.buffer.write(bytes([0x00, 0x7f, 0x80, 0xff]))
 objdump -d -M intel --no-show-raw-insn --disassemble=transform 08_transform
 ```
 
-인자는 4주차 규칙대로 `rdi`=입력 포인터, `rsi`=길이, `rdx`=출력 포인터입니다. 프롤로그에서 각각 `[rbp-0x28]`, `[rbp-0x30]`, `[rbp-0x38]`에 저장됩니다. 지역 변수와 초기값을 먼저 정리합니다.
+인자는 Chapter 4 규칙대로 `rdi`=입력 포인터, `rsi`=길이, `rdx`=출력 포인터입니다. 프롤로그에서 각각 `[rbp-0x28]`, `[rbp-0x30]`, `[rbp-0x38]`에 저장됩니다. 지역 변수와 초기값을 먼저 정리합니다.
 
 | 위치 | 크기 | 초기값 | 역할(가설) |
 |---|---|---|---|
@@ -205,13 +205,13 @@ python3 examples/reverse_engineering/compare_transform.py \
 - `out`은 바이트마다 독립이고 역변환이 쉽습니다: `in[i] = ((out[i] - 7i) & 0xff) ^ key_i`.
 - `acc`는 오류 검출용 체크섬처럼 보이지만 `A`·`B`처럼 한 바이트만 달라도 충돌하며, 의도적인 충돌도 쉽게 만들 수 있습니다.
 
-알려진 상수(예: FNV 해시의 `0x811c9dc5`, CRC-32 표)가 보이면 이미 공개된 알고리즘일 가능성을 검토하되, 상수 하나만으로 단정하지 않고 이번 주처럼 재구현 비교로 확인합니다.
+알려진 상수(예: FNV 해시의 `0x811c9dc5`, CRC-32 표)가 보이면 이미 공개된 알고리즘일 가능성을 검토하되, 상수 하나만으로 단정하지 않고 이 Chapter처럼 재구현 비교로 확인합니다.
 
 ## 8. 수정 과제와 제출물
 
 1. 재구현에 역변환 `untransform(output: bytes) -> bytes`를 추가하고, 비교 입력 전부에서 `untransform(transform(x)[0]) == x`를 확인합니다.
 2. C 소스 복사본에서 `signed_value / 4`를 `signed_value >> 2`로 바꿉니다. 디스어셈블에서 사라지는 명령을 예측하고, 재구현을 어떻게 바꿔야 하는지 확인합니다. (부호 있는 음수의 오른쪽 시프트 결과는 C 표준에서 구현 정의이며, GCC는 산술 시프트로 정의합니다.)
-3. `-O2`로 빌드한 복사본을 디스어셈블합니다. 같은 알고리즘이 어떻게 달라 보이는지 기록하고, 재구현이 그대로 통과하는지 비교 도구로 확인합니다. 최적화 비교는 10주차에서 자세히 다룹니다.
+3. `-O2`로 빌드한 복사본을 디스어셈블합니다. 같은 알고리즘이 어떻게 달라 보이는지 기록하고, 재구현이 그대로 통과하는지 비교 도구로 확인합니다. 최적화 비교는 Chapter 10에서 자세히 다룹니다.
 
 제출물:
 

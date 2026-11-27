@@ -1,6 +1,6 @@
-# 3주차 패킷과 캡처 읽기
+# Chapter 3 패킷과 캡처 읽기
 
-[이전 2주차](week-02.md) · [12주 커리큘럼](curriculum.md) · [다음 4주차](week-04.md)
+[이전 Chapter 2](chapter-02.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 4](chapter-04.md)
 
 ## 파일 오프셋과 패킷 오프셋
 

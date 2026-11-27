@@ -1,6 +1,6 @@
-# 9주차 자원 제한과 가용성
+# Chapter 9 자원 제한과 가용성
 
-[이전 8주차](week-08.md) · [12주 커리큘럼](curriculum.md) · [다음 10주차](week-10.md)
+[이전 Chapter 8](chapter-08.md) · [네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 10](chapter-10.md)
 
 ## 크기·대기 시간·상태를 각각 제한하기
 

@@ -1,6 +1,6 @@
-# 1주차 네트워크 구조와 관찰
+# Chapter 1 네트워크 구조와 관찰
 
-[12주 커리큘럼](curriculum.md) · [다음 2주차](week-02.md)
+[네트워크 보안 커리큘럼](curriculum.md) · [다음 Chapter 2](chapter-02.md)
 
 ## IP 주소와 포트
 

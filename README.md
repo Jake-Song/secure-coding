@@ -2,11 +2,11 @@
 
 ## 보안 과정
 
-- [정보보안 종합 커리큘럼](docs/curriculum.md)은 입문자가 40주 동안 메모 서비스를 설계하고 보호하며 탐지·사고 대응·복구까지 실습하는 전체 학습 경로입니다.
+- [정보보안 종합 커리큘럼](docs/curriculum.md)은 40개 Chapter에 걸쳐 입문자가 메모 서비스를 설계하고 보호하며 탐지·사고 대응·복구까지 실습하는 전체 학습 경로입니다.
 - [웹 보안 과정](docs/web-security/curriculum.md)에서 네트워크 기초, Flask 요청 흐름, Burp, 웹·API 방어와 회귀 테스트를 학습합니다.
-- [네트워크 보안 12주 과정](docs/network-security/curriculum.md)에서 TCP·UDP·DNS, 패킷 읽기, TLS·메시지 인증, 접근 정책과 로그 탐지를 실습합니다.
-- [역엔지니어링 12주 과정](docs/reverse-engineering/curriculum.md)에서 C 빌드, 메모리, x86-64 어셈블리, ELF, GDB·Ghidra 분석을 학습합니다. 1~8주차에는 실행 예제와 단계별 안내가 있습니다.
-- [AI 서비스 보안 8주 과정](docs/ai-security/curriculum.md)에서 문서 검색과 요약, 모델 출력 검증, 도구 권한, 보안 평가와 사고 대응을 로컬 메모 도우미 예제로 학습합니다.
+- [네트워크 보안 과정](docs/network-security/curriculum.md)에서 TCP·UDP·DNS, 패킷 읽기, TLS·메시지 인증, 접근 정책과 로그 탐지를 실습합니다.
+- [역엔지니어링 과정](docs/reverse-engineering/curriculum.md)에서 C 빌드, 메모리, x86-64 어셈블리, ELF, GDB·Ghidra 분석을 학습합니다. Chapter 1~8에는 실행 예제와 단계별 안내가 있습니다.
+- [AI 서비스 보안 과정](docs/ai-security/curriculum.md)에서 문서 검색과 요약, 모델 출력 검증, 도구 권한, 보안 평가와 사고 대응을 로컬 메모 도우미 예제로 학습합니다.
 
 ## 프로그래밍 입문
 

@@ -1,8 +1,8 @@
-# 6주차: GDB 동적 분석
+# Chapter 6: GDB 동적 분석
 
-[이전: 5주차](week-05.md) · [12주 커리큘럼](curriculum.md) · [다음: 7주차](week-07.md)
+[이전: Chapter 5](chapter-05.md) · [역엔지니어링 커리큘럼](curriculum.md) · [다음: Chapter 7](chapter-07.md)
 
-이번 주 목표는 **5주차의 정적 분석 가설을 실행 관찰로 검증**하는 것입니다. 같은 대상 `05_lookup`과 `05_lookup_stripped`를 사용합니다. 두 입력의 실행 경로를 명령 단위로 비교하고, 기록을 다른 사람이 다시 실행할 수 있는 GDB 스크립트로 남깁니다.
+이 Chapter 목표는 **Chapter 5의 정적 분석 가설을 실행 관찰로 검증**하는 것입니다. 같은 대상 `05_lookup`과 `05_lookup_stripped`를 사용합니다. 두 입력의 실행 경로를 명령 단위로 비교하고, 기록을 다른 사람이 다시 실행할 수 있는 GDB 스크립트로 남깁니다.
 
 ## 1. 학습 순서와 시간
 
@@ -31,7 +31,7 @@
 
 ### ASLR과 GDB
 
-GDB는 기본적으로 ASLR을 끄고 실행합니다. 그러면 PIE도 매번 `0x555555554000` 근처에 놓여, 주소를 외워도 되는 것처럼 보입니다. 4주차와 같이 이번 과정에서는 `set disable-randomization off`로 실제 환경에 가깝게 두고, **주소는 매 실행 계산**합니다.
+GDB는 기본적으로 ASLR을 끄고 실행합니다. 그러면 PIE도 매번 `0x555555554000` 근처에 놓여, 주소를 외워도 되는 것처럼 보입니다. Chapter 4와 같이 이번 과정에서는 `set disable-randomization off`로 실제 환경에 가깝게 두고, **주소는 매 실행 계산**합니다.
 
 ## 3. 실습 A: 반환값으로 H1 검증
 
@@ -67,13 +67,13 @@ x/2wu $rax + 8
 print *(const struct account *)$rax
 ```
 
-`$rax - &accounts`는 16이어야 합니다. 즉 1번 원소입니다. `x/s *(char **)$rax`는 원소 `+0`의 포인터가 가리키는 문자열 `analyst`, `x/2wu $rax+8`은 level 3·flags 1입니다. 마지막 `print`는 디버그 정보가 있는 빌드에서만 가능합니다. 앞의 세 명령은 자료형 정보 없이 5주차에서 추론한 오프셋만으로 같은 사실을 보여 줍니다.
+`$rax - &accounts`는 16이어야 합니다. 즉 1번 원소입니다. `x/s *(char **)$rax`는 원소 `+0`의 포인터가 가리키는 문자열 `analyst`, `x/2wu $rax+8`은 level 3·flags 1입니다. 마지막 `print`는 디버그 정보가 있는 빌드에서만 가능합니다. 앞의 세 명령은 자료형 정보 없이 Chapter 5에서 추론한 오프셋만으로 같은 사실을 보여 줍니다.
 
 `run`을 다시 입력하면 GDB가 프로그램을 처음부터 다시 시작할지 묻습니다. 새 실행에서는 주소가 바뀔 수 있으므로 앞 실행의 주소를 재사용하지 않습니다.
 
 ## 4. 실습 B: 두 입력의 경로 비교로 H2 검증
 
-`is_allowed`의 첫 명령에서 멈춥니다. 4주차에서 확인했듯이 첫 명령에서는 첫 두 인자가 `rdi`, `esi`에 있습니다.
+`is_allowed`의 첫 명령에서 멈춥니다. Chapter 4에서 확인했듯이 첫 명령에서는 첫 두 인자가 `rdi`, `esi`에 있습니다.
 
 ```gdb
 delete
@@ -84,7 +84,7 @@ x/4wx $rdi
 disassemble
 ```
 
-첫 명령에서 GDB가 `is_allowed (account=0x0, required=0)`처럼 엉뚱한 인자 값을 보여 줄 수 있습니다. 디버그 정보는 인자를 프롤로그 뒤 `[rbp-...]`에서 찾는데, 첫 명령에서는 아직 그 위치에 저장하지 않았기 때문입니다. 이번 주에는 **레지스터 값을 기준**으로 기록합니다.
+첫 명령에서 GDB가 `is_allowed (account=0x0, required=0)`처럼 엉뚱한 인자 값을 보여 줄 수 있습니다. 디버그 정보는 인자를 프롤로그 뒤 `[rbp-...]`에서 찾는데, 첫 명령에서는 아직 그 위치에 저장하지 않았기 때문입니다. 이 Chapter에는 **레지스터 값을 기준**으로 기록합니다.
 
 `disassemble`에서 `and eax,0x1` 다음 분기와 `cmp`·`setae` 위치를 확인한 뒤 `stepi`로 한 명령씩 진행합니다.
 
@@ -106,7 +106,7 @@ stepi
 
 `guest`와 `retired`는 출력이 같지만 **거부되는 명령 위치가 다릅니다**. 이것이 H2의 근거입니다. 출력만 비교하면 이 차이를 알 수 없습니다.
 
-`setae`가 unsigned 조건이라는 5주차 해석도 여기서 확인합니다. level 1과 required 3을 비교하면 unsigned 빌림이 생겨 CF=1, `setae`는 0을 만듭니다.
+`setae`가 unsigned 조건이라는 Chapter 5 해석도 여기서 확인합니다. level 1과 required 3을 비교하면 unsigned 빌림이 생겨 CF=1, `setae`는 0을 만듭니다.
 
 ## 5. 실습 C: 워치포인트로 H3 검증
 
@@ -172,7 +172,7 @@ x/2wu $rax + 8
 continue
 ```
 
-디버그 빌드와 같은 값(`analyst`, 3, 1)이 보이면, 5주차의 주소 변환식이 실행 중에도 맞다는 증거입니다. `nobody`로 반복하면 `rax=0`이고, 이어지는 `x/s *(char **)$rax`는 `Cannot access memory at address 0x0` 오류를 냅니다. NULL을 역참조하려 했기 때문이며, H1과 일치하는 관찰입니다.
+디버그 빌드와 같은 값(`analyst`, 3, 1)이 보이면, Chapter 5의 주소 변환식이 실행 중에도 맞다는 증거입니다. `nobody`로 반복하면 `rax=0`이고, 이어지는 `x/s *(char **)$rax`는 `Cannot access memory at address 0x0` 오류를 냅니다. NULL을 역참조하려 했기 때문이며, H1과 일치하는 관찰입니다.
 
 주 실행 파일의 로드 베이스는 페이지 단위로 정렬돼 하위 12비트가 0입니다. 두 번 새로 실행해 `$base`가 바뀌는지 확인합니다.
 
@@ -208,7 +208,7 @@ done
 
 1. `find_account` 안의 `call` 명령(`strcmp` 호출) 주소에 중단점을 두고, 멈출 때마다 `x/s $rdi`, `x/s $rsi`를 출력한 뒤 `continue`하는 `commands`를 작성합니다. `root` 입력에서 비교된 이름 4개를 순서대로 기록합니다.
 2. strip 파일에서 `is_allowed`의 첫 명령 주소를 찾아 `$base`로 중단하고 실습 B의 경로 비교표를 다시 채웁니다.
-3. 5주차 수정 과제 1(`auditor` 추가)을 빌드했다면 `nobody`의 워치포인트 변화 횟수를 예측하고 확인합니다.
+3. Chapter 5 수정 과제 1(`auditor` 추가)을 빌드했다면 `nobody`의 워치포인트 변화 횟수를 예측하고 확인합니다.
 
 제출물:
 
